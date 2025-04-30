@@ -1,0 +1,2502 @@
+{% load static %}
+<html lang="en">
+  <head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <link rel="icon" href="{% static 'img/image01.png' %}" type="image/png">
+    <meta name="HandheldFriendly" content="true" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>ConnectSuite</title>
+    <link href="{% static 'css/chat.css' %}" rel="stylesheet"/>
+    <link
+      href="{% static 'vendor/fontawesome-free/css/all.min.css' %}"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+            .typing-indicator-container {
+          height: 20px;
+          margin: 5px 0;
+          padding: 0 15px;
+      }
+
+      .typing-indicator {
+          display: inline-flex;
+          align-items: center;
+          padding: 8px 12px;
+          background-color: #f1f1f1;
+          border-radius: 18px;
+          font-size: 12px;
+          color: #555;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+      }
+
+      .typing-indicator.show {
+          opacity: 1;
+      }
+
+      .typing-dots {
+          display: flex;
+          margin-right: 8px;
+      }
+
+      .dot {
+          width: 6px;
+          height: 6px;
+          background-color: #888;
+          border-radius: 50%;
+          margin: 0 2px;
+          animation: bounce 1.4s infinite ease-in-out;
+      }
+
+      .dot:nth-child(1) {
+          animation-delay: -0.32s;
+      }
+
+      .dot:nth-child(2) {
+          animation-delay: -0.16s;
+      }
+
+      @keyframes bounce {
+          0%, 80%, 100% {
+              transform: translateY(0);
+          }
+          40% {
+              transform: translateY(-5px);
+          }
+      }
+      .maximize-chat {
+        background: none;
+        border: none;
+        color: white;
+        font-family: Georgia, serif;
+        justify-content: space-between;
+        font-size: 20px;
+        cursor: pointer;
+        transition: color 0.3s ease;
+        margin-right: 10px;
+      }
+
+      .maximize-chat:hover {
+        color: #ffcc00;
+      }
+
+      .chat-content-panel.maximized {
+        width: 78vw;
+        height: 90vh;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1100;
+      }
+      .chat-content-panel.maximized .chat-container{
+        height: calc(110% - 110px);
+        max-height: none;
+      }
+
+      .chat-content-panel.maximized .chat-container2 {
+        height: calc(100% - 100px);
+        max-height: none;
+      }
+
+      .chat-content-panel.maximized .screen-share-container {
+        height: 50%;
+      }
+
+      .chat-content-panel.minimized {
+          height: 60px !important;
+          width: 310px !important;
+          overflow: hidden;
+      }
+
+      .chat-content-panel.minimized .chat-container {
+          display: none;
+      }
+
+      .minimized-chat-header {
+          cursor: pointer;
+          background: #f1f1f1;
+          justify-content: space-between;
+          border-bottom: 1px solid #ddd;
+          margin-right:15px;
+      }
+
+        @keyframes pulse {
+          0% { opacity: 1; }
+          50% { opacity: 0.5; }
+          100% { opacity: 1; }
+        }
+
+        .notification-pulse {
+          animation: pulse 1s infinite;
+        }
+
+      @media (max-width: 768px) {
+
+        .chat-content-panel.maximized {
+            width: 95vw;
+            height: 85vh;
+        }
+
+        .header {
+          padding: 8px 10px;
+          font-size: 16px;
+        }
+
+        .logo {
+          width: 40px;
+          height: 40px;
+        }
+
+        .chat-panel {
+          width: 100%;
+          height: 70vh;
+          bottom: 0;
+          right: 0;
+          border-radius: 10px 10px 0 0;
+        }
+
+        .chat-content-panel {
+          width: 100%;
+          height: 70vh;
+          bottom: 0;
+          right: 0;
+          border-radius: 10px 10px 0 0;
+        }
+        .chat-container2 {
+          width: 100%;
+          height: 70vh;
+          max-height: 70vh;
+          margin: 0;
+        }
+        .chat-button {
+          width: 60px;
+          height: 60px;
+          bottom: 20px;
+          right: 20px;
+        }
+
+        .chat-input {
+          padding: 8px;
+        }
+
+        .message-input {
+          font-size: 14px;
+        }
+
+        .message-bubble {
+          max-width: 85%;
+          padding: 8px 12px;
+          font-size: 14px;
+        }
+
+        .avatar {
+          width: 32px;
+          height: 32px;
+        }
+
+        .chat-list li {
+          padding: 10px;
+        }
+
+        .chat-list img {
+          width: 30px;
+          height: 30px;
+        }
+
+        .screen-share-container {
+          height: auto;
+          max-height: 40vh;
+        }
+
+        .localVideo,
+        .remoteVideo {
+          max-height: 30vh;
+          background: #000;
+          object-fit: contain;
+        }
+        .remoteVideo {
+          display: block;
+        }
+
+        .localVideo.active {
+          display: block;
+        }
+
+        .video-play-button {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 10;
+          padding: 10px 20px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+
+
+        .nav-menu {
+          position: fixed;
+          top: 60px;
+          left: 0;
+          width: 100%;
+          background: linear-gradient(135deg, #4e73df, #6cb2eb);
+          flex-direction: column;
+          padding: 10px 0;
+          display: none;
+        }
+
+        .nav-menu.active {
+          display: flex;
+        }
+
+        .nav-menu li {
+          margin: 5px 0;
+          text-align: center;
+        }
+
+        .menu-toggle {
+          display: block;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .chat-panel,
+        .chat-content-panel {
+          height: 80vh;
+        }
+
+        .message-bubble {
+          max-width: 90%;
+        }
+
+        .chat-button {
+          width: 50px;
+          height: 50px;
+          bottom: 15px;
+          right: 15px;
+        }
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #87cefa, #b0e0e6);
+        border-radius: 10px;
+        transition: background 0.3s ease-in-out;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(45deg, #3757c3, #c08ef0);
+      }
+      .connection-status {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background-color: gray;
+      }
+      .connection-status.connected {
+        background-color: #28a745;
+        animation: pulse 1.5s infinite;
+      }
+      .connection-status.connecting {
+        background-color: #ffc107;
+      }
+      .connection-status.disconnected {
+        background-color: #dc3545;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        background-color: #4e73df;
+        color: white;
+        padding: 10px;
+        font-size: 20px;
+        font-weight: bold;
+        z-index: 1000;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+      .content {
+        margin-top: 70px;
+      }
+      body {
+        background-image: url("/static/img/bg.png");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+      .chat-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        overflow-y: auto;
+        padding: 5px;
+        z-index: 1050;
+      }
+
+      .chat-button img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: invert(10%);
+      }
+
+      .chat-panel {
+        font-family: Georgia, serif;
+        position: fixed;
+        bottom: 0px;
+        right: 20px;
+        width: 280px;
+        height: 400px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease-in-out;
+        z-index: 1040;
+        display: flex;
+        overflow: hidden;
+        flex-direction: column;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+      }
+      .chat-panel.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .chat-content-panel {
+        display: none;
+        position: fixed;
+        bottom: 0px;
+        right: 320px;
+        flex: 1;
+        font-size: 20px;
+        background: white;
+        height: 400px;
+        width: 300px;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        transition: all 0.3s ease-in-out;
+        overflow: hidden;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        z-index: 1030;
+      }
+      .chat-content-panel.active {
+        display: flex;
+        flex-direction: column;
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      .container {
+        position: flex;
+      }
+      .chat-container2 {
+        position: flex;
+        width: 100%;
+        height: 300px;
+        max-height: 350px;
+        margin: 5;
+        flex-grow: 1;
+        background: linear-gradient(to bottom, #f8f9fc, #e3e6f0);
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        overflow-y: auto;
+        flex-direction: column;
+      }
+
+      .screen-share-container {
+        display: none;
+        position: flex;
+        flex-direction: column;
+        gap: 10px;
+        border: 5px;
+        margin-top: 5px;
+        padding: 10px;
+        background: #f8f9fc;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        height: 10px;
+      }
+
+      .localVideo,
+      .remoteVideo {
+        width: 100%;
+        height: auto;
+        border-radius: 5px;
+        background: #000;
+        object-fit: cover;
+        display: none;
+      }
+
+      .localVideo.active,
+      .remoteVideo.active {
+        display: block;
+      }
+      .chat-header {
+        font-family: Georgia, serif;
+        background-color: #4e73df;
+        display: flex;
+        justify-content: space-between;
+        color: white;
+        padding: 10px;
+        align-items: center;
+        font-weight: bold;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .chat-header button {
+        background: none;
+        border: none;
+        color: white;
+        font-family: Georgia, serif;
+        font-size: 20px;
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+
+      .chat-header button:hover {
+        color: #ffcc00;
+      }
+      .chat-list {
+        list-style: none;
+        font-family: Georgia, serif;
+        padding: 5px;
+        margin: 0;
+        flex-grow: 1;
+        overflow-y: auto;
+        max-height: calc(100% - 50px);
+      }
+      .chat-list li {
+        padding: 4px;
+        margin-bottom: 2px;
+        border-radius: 5px;
+        background: #f8f9fc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .chat-list li:hover {
+        background: #e2e6ea;
+      }
+      .chat-list img {
+        width: 35px;
+        height: 35px;
+        margin-right: 10px;
+        border-radius: 50%;
+      }
+      .status-badge {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        margin-left: 10px;
+      }
+      .online {
+        background-color: #28a745;
+      }
+      .offline {
+        background-color: #6c757d;
+      }
+      .notification-badge {
+        font-size: 8px;
+        padding: 5px 10px;
+        border-radius: 10px;
+        background-color: red;
+        color: white;
+        font-weight: bold;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(0.9);
+          opacity: 0.7;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(0.9);
+          opacity: 0.7;
+        }
+      }
+
+      .chat-notification {
+        position: absolute;
+        top: -5px;
+        right: 2px;
+        background-color: red;
+        color: white;
+        font-size: 12px;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        border-radius: 50%;
+        display: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        animation: pulse 3s infinite ease-in-out;
+        overflow: hidden;
+      }
+      .messages {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        max-height: 500px;
+        word-wrap: break-word;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, #ffffff, #f0f0f0);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .messages::-webkit-scrollbar {
+        width: 8px;
+        background-color: #ddd;
+      }
+      .chat-panel::-webkit-scrollbar-thumb {
+        background-color: #aaa;
+        border-radius: 4px;
+      }
+      .messages::-webkit-scrollbar-thumb {
+        background-color: #aaa;
+        border-radius: 4px;
+      }
+      .message-container {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+      }
+      .message-container.me {
+        justify-content: flex-end;
+      }
+      .message-container.other {
+        justify-content: flex-start;
+      }
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #ccc;
+        flex-shrink: 0;
+      }
+      .message-bubble {
+        max-width: 75%;
+        padding: 10px 14px;
+        border-radius: 15px;
+        font-family: Georgia, serif;
+        font-size: 15px;
+        position: relative;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        transition: transform 0.2s ease-in-out;
+      }
+      .message-container.me .message-bubble {
+        background: linear-gradient(to right, #4e73df, #1e40af);
+        color: white;
+        text-align: right;
+        border-bottom-right-radius: 5px;
+      }
+      .message-container.other .message-bubble {
+        background: linear-gradient(to right, #8a2be2, #5b21b6);
+        color: white;
+        text-align: left;
+        border-bottom-left-radius: 5px;
+      }
+      .message-timestamp {
+        font-size: 0.6rem;
+        color: gray;
+        margin-top: 5px;
+        text-align: right;
+      }
+      @keyframes messageAppear {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .message-bubble {
+        animation: messageAppear 0.1s ease-in-out;
+      }
+      .username {
+        font-size: 0.6rem;
+        font-family: Georgia, serif;
+        color: white;
+        font-style: Italic;
+      }
+      .status {
+        font-size: 0.4rem;
+        font-style: Italic;
+      }
+      .unread-badge {
+        font-size: 0.4rem;
+        font-style: Italic;
+        font-color: #ee4b2b;
+      }
+      .message-timestamp {
+        font-size: 0.5rem;
+        color: white;
+        margin-top: 5px;
+        text-align: right;
+      }
+      .chat-input {
+        display: flex;
+        align-items: center;
+        padding: 5px;
+        background-color: #fff;
+        border-radius: 5px;
+        border-top: 1px solid #ccc;
+        gap: 5px;
+      }
+      .chat-input textarea {
+        flex: 1;
+        resize: none;
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        outline: none;
+      }
+      .chat-input button {
+        background: #4e73df;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        margin-left: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .chat-input button:hover {
+        background-color: #004d36;
+      }
+      .input-container {
+        display: flex;
+        padding: 5px;
+        background-color: linear-gradient(135deg, #6cb2eb, #4e73df);
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+      .message-input {
+        width: 100%;
+        padding: 5px;
+        background-color: linear-gradient(135deg, #6cb2eb, #4e73df);
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-right: 10px;
+      }
+      .send-btn {
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, #6cb2eb, #4e73df);
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .send-btn:hover {
+        background: linear-gradient(
+          135deg,
+          #4e73df,
+          #6cb2eb
+        ); /* Inverted lighter gradient on hover */
+      }
+
+      .send-btn img {
+        width: 20px;
+        height: 20px;
+      }
+
+      .shareBtn {
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, #6cb2eb, #4e73df);
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .shareBtn:hover {
+        background: linear-gradient(135deg, #4e73df, #6cb2eb);
+      }
+
+      .shareBtn img {
+        width: 20px;
+        height: 20px;
+      }
+      #avatar-pic {
+        width: 50px;
+        height: 50px;
+        background-color: #e6e6fa;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      #avatar-pic:hover {
+        background-color: #d8bfd8;
+      }
+      #avatar-pic img {
+        width: 25px;
+        height: 25px;
+      }
+      .options {
+        display: none;
+        position: absolute;
+        background: #fff;
+        border: 1px solid #ddd;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+      }
+      .options button {
+        display: block;
+        width: 100%;
+        padding: 8px;
+        border: none;
+        background: #fff;
+        cursor: pointer;
+      }
+      .options button:hover {
+        background: #f0f0f0;
+      }
+      .user-status {
+        font-size: 20px;
+        margin-left: 5px;
+      }
+      @keyframes badge-pulse {
+        0% {
+          transform: scale(1);
+          background-color: #dc3545;
+        }
+        50% {
+          transform: scale(1.2);
+          background-color: #ff5b5b;
+        }
+        100% {
+          transform: scale(1);
+          background-color: #dc3545;
+        }
+      }
+
+      @keyframes badge-fadein {
+        0% {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .notification-badge {
+        display: inline-block;
+        padding: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        color: white;
+        border-radius: 50%;
+        background-color: #dc3545;
+        animation: badge-pulse 2s infinite, badge-fadein 0.5s ease-out;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Arial", sans-serif;
+      }
+
+      .background-effects {
+        background-image: url("/static/img/bg.png");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+
+      .header-tag {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: black;
+        background: linear-gradient(135deg, #f0f0f0, #d1d1d1);
+        padding: 15px 30px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #4e73df, #6cb2eb);
+        color: black;
+        padding: 15px 30px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: background 0.3s ease-in-out;
+      }
+      .logo {
+        font-size: 24px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #6cb2eb, #4e73df);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        overflow: hidden;
+      }
+
+      .logo:hover {
+        background: linear-gradient(135deg, #4e73df, #6cb2eb);
+        transform: scale(1.1);
+      }
+
+      .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: invert(0%);
+      }
+      .nav-menu {
+        display: flex;
+        list-style: none;
+      }
+
+      .nav-menu li {
+        margin: 0 15px;
+      }
+
+      .nav-menu li a {
+        text-decoration: none;
+        color: white;
+        font-size: 16px;
+        transition: color 0.3s ease-in-out;
+      }
+
+      .nav-menu li a:hover {
+        text-decoration: underline;
+        color: #f0f0f0;
+      }
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .profile-pic {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: linear-gradient(135deg, #4e73df, #6cb2eb);
+        border: 2px solid white;
+      }
+
+      .logout-button {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #f0f0f0, #d1d1d1);
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
+      }
+
+      .logout-button:hover {
+        background: linear-gradient(135deg, #d1d1d1, #a0a0a0);
+        transform: scale(1.1);
+      }
+
+      .logout-button img {
+        width: 30px;
+        height: 30px;
+      }
+
+      .menu-toggle {
+        display: none;
+        font-size: 24px;
+        cursor: pointer;
+      }
+
+      @media (max-width: 768px) {
+        .nav-menu {
+          display: none;
+          flex-direction: column;
+          background: linear-gradient(135deg, #f0f0f0, #d1d1d1);
+          position: absolute;
+          top: 60px;
+          left: 0;
+          width: 100%;
+          padding: 10px;
+          border-top: 2px solid black;
+        }
+
+        .nav-menu.active {
+          display: flex;
+        }
+
+        .menu-toggle {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header-tag">
+      <header class="header">
+        <div class="logo">
+          <img src="{% static 'img/chat logo.png' %}" alt="logo" />
+        </div>
+        <div class="menu-toggle">
+          <i class="fas fa-bars"></i>
+        </div>
+        <h2>Connect Suite</h2>
+        <ul class="nav-menu">
+          <li><a href="/logout">Home</a></li>
+          <li><a href="/users">About</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="/chatbot">Ari</a></li>
+        </ul>
+
+        <div class="user-info">
+          <img
+            src="{% static 'img/ProfilePic.png' %}"
+            alt="Profile"
+            class="profile-pic"
+          />
+          {% csrf_token %}
+          <a href="{% url 'logout' %}" class="logout-button">
+            <img
+              src="https://img.icons8.com/?size=100&id=HqVUJDljsIvX&format=png&color=000000"
+              alt="Logout"
+            />
+          </a>
+        </div>
+      </header>
+    </div>
+    <div class="background-effects">
+      <button class="chat-button">
+        <img src="{% static 'img/image03.png' %}" alt="Chat" />
+        <span class="chat-notification" id="chat-notification">!</span>
+      </button>
+
+      <div class="chat-panel">
+        <div class="chat-header">
+          <h5>Chatty</h5>
+          <button class="close-chat">&times;</button>
+        </div>
+        <ul class="chat-list">
+          {% for user in users %}
+          <li data-username="{{ user.username }}" data-id="{{ user.id }}">
+            <div class="d-flex align-items-center">
+              <img
+                src="https://img.icons8.com/?size=100&id=61005&format=png&color=000000"
+                alt="User"
+              />
+              <span>{{ user.username }}</span>
+              <span
+                class="status-badge offline"
+                id="user-status-{{ user.id }}"
+              ></span>
+            </div>
+            <span
+              class="badge bg-danger notification-badge"
+              id="notification-badge-{{ user.username }}"
+              style="display: none"
+              >0</span
+            >
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="chat-content-panel"></div>
+    </div>
+    {% include 'chatbot.html' %}
+    <script>
+      class ScreenSharing {
+        constructor() {
+          this.peerConnections = {};
+          this.localStreams = {};
+          this.makingOffer = {};
+          this.ignoreOffer = {};
+          this.polite = {};
+          this.peerData = {};
+          this.shareSockets = {};
+          this.messageQueue = {};
+          this.rtcConfig = {
+            iceServers: [
+              {
+                urls: "turn:relay1.expressturn.com:3478",
+                username: "ef0OSL1KJJM05XK829",
+                credential: "4HQgeo0mAcWomtgj",
+              },
+              {
+                urls: [
+                  "stun:stun.l.google.com:19302",
+                  "stun:stun1.l.google.com:19302",
+                  "stun:stun2.l.google.com:19302",
+                ],
+              },
+            ],
+            iceTransportPolicy: "all",
+            bundlePolicy: "max-bundle",
+            rtcpMuxPolicy: "require",
+            iceCandidatePoolSize: 10,
+          };
+        }
+
+        async initScreenSharing(chatPanelId, sender, recipient) {
+          try {
+            console.log(`Initializing screen sharing for ${chatPanelId}`);
+            this.cleanupScreenSharing(chatPanelId);
+            this.peerData[chatPanelId] = {
+              sender: sender,
+              recipient: recipient,
+            };
+            this.polite[chatPanelId] = true;
+            this.makingOffer[chatPanelId] = false;
+            this.ignoreOffer[chatPanelId] = false;
+
+            this.shareSockets[chatPanelId] = new WebSocket(
+              window.location.protocol === "https:"
+                ? `wss://${window.location.host}/ws/screenshare/${sender}/${recipient}/`
+                : `ws://${window.location.host}/ws/screenshare/${sender}/${recipient}/`
+            );
+            this.shareSockets[chatPanelId].open = async () => {
+              if (!this.peerConnections[chatPanelId]) {
+                await this.createPeerConnection(chatPanelId);
+              }
+            };
+            this.shareSockets[chatPanelId].sender = sender;
+            this.shareSockets[chatPanelId].recipient = recipient;
+            this.setupSocketHandlers(chatPanelId);
+            this.createVideoElements(chatPanelId);
+            this.setupEventListeners(chatPanelId, sender, recipient);
+
+            console.log(`Screen sharing initialized for ${chatPanelId}`);
+          } catch (error) {
+            console.error(`Error initializing screen sharing: ${error}`);
+            this.showError(chatPanelId, "Failed to initialize screen sharing");
+          }
+        }
+
+        setupSocketHandlers(chatPanelId) {
+          const socket = this.shareSockets[chatPanelId];
+
+          socket.onopen = async () => {
+            console.log(`Screen share WebSocket opened for ${chatPanelId}`);
+            this.updateConnectionStatus(chatPanelId, "connecting");
+            await this.createPeerConnection(chatPanelId);
+            this.processMessageQueue(chatPanelId);
+          };
+
+          socket.onerror = (error) => {
+            console.error(`WebSocket error for ${chatPanelId}:`, error);
+            this.updateConnectionStatus(chatPanelId, "disconnected");
+          };
+
+          socket.onclose = () => {
+            console.log(`WebSocket closed for ${chatPanelId}`);
+            this.updateConnectionStatus(chatPanelId, "disconnected");
+            this.cleanupSocket(chatPanelId);
+          };
+
+          socket.onmessage = async (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              console.log(`Received ${data.type} for ${chatPanelId}`, data);
+
+              if (!this.isValidMessageType(data.type)) {
+                console.warn(`Invalid message type: ${data.type}`);
+                return;
+              }
+
+              if (!this.isPeerConnectionReady(chatPanelId)) {
+                console.log(`PeerConnection not ready, queuing ${data.type}`);
+                this.queueMessage(chatPanelId, data);
+                return;
+              }
+
+              await this.processSignalingMessage(chatPanelId, data);
+            } catch (error) {
+              console.error(
+                `Error handling message for ${chatPanelId}:`,
+                error
+              );
+            }
+          };
+        }
+
+        createVideoElements(chatPanelId) {
+          const container = document.getElementById(
+            `screen-share-container-${chatPanelId}`
+          );
+          let remoteVideo = document.getElementById(
+            `remoteVideo-${chatPanelId}`
+          );
+          if (remoteVideo) {
+            remoteVideo.muted = true;
+            remoteVideo.playsInline = true;
+
+            const playPromise = remoteVideo.play();
+            if (playPromise !== undefined) {
+              playPromise.catch(() => {
+                this.showPlayButton(chatPanelId, remoteVideo);
+              });
+            }
+          }
+          if (!container) {
+            console.error(`Container not found for ${chatPanelId}`);
+            return;
+          }
+          if (!remoteVideo) {
+            remoteVideo = document.createElement("video");
+            remoteVideo.id = `remoteVideo-${chatPanelId}`;
+            remoteVideo.autoplay = true;
+            remoteVideo.muted = true;
+            remoteVideo.playsInline = true;
+            container.appendChild(remoteVideo);
+          }
+          remoteVideo.onplay = () => {
+            const playBtn = container.querySelector(".video-play-button");
+            if (playBtn) playBtn.remove();
+          };
+
+          if (!document.getElementById(`localVideo-${chatPanelId}`)) {
+            const localVideo = document.createElement("video");
+            localVideo.id = `localVideo-${chatPanelId}`;
+            localVideo.className = "localVideo";
+            localVideo.autoplay = true;
+            localVideo.muted = true;
+            localVideo.playsInline = true;
+            container.appendChild(localVideo);
+          }
+
+          if (!document.getElementById(`remoteVideo-${chatPanelId}`)) {
+            const remoteVideo = document.createElement("video");
+            remoteVideo.id = `remoteVideo-${chatPanelId}`;
+            remoteVideo.className = "remoteVideo";
+            remoteVideo.autoplay = true;
+            remoteVideo.muted = true;
+            remoteVideo.playsInline = true;
+            container.appendChild(remoteVideo);
+          }
+
+          if (!document.getElementById(`connection-status-${chatPanelId}`)) {
+            const statusIndicator = document.createElement("div");
+            statusIndicator.id = `connection-status-${chatPanelId}`;
+            statusIndicator.className = "connection-status";
+            container.appendChild(statusIndicator);
+          }
+        }
+        showPlayButton(chatPanelId) {
+          const container = document.getElementById(
+            `screen-share-container-${chatPanelId}`
+          );
+          const video = document.getElementById(`remoteVideo-${chatPanelId}`);
+          if (!container || !video) return;
+          const existingBtn = container.querySelector(".video-play-button");
+          if (existingBtn) existingBtn.remove();
+
+          const playBtn = document.createElement("button");
+          playBtn.className = "video-play-button";
+          playBtn.textContent = "Play Video";
+          playBtn.onclick = () => {
+            video.play().catch((e) => console.error("Playback failed:", e));
+          };
+          container.appendChild(playBtn);
+        }
+        setupEventListeners(chatPanelId, sender, recipient) {
+          $(`#shareBtn-${chatPanelId}`)
+            .off("click")
+            .on("click", async () => {
+              if (this.localStreams[chatPanelId]) {
+                await this.stopScreenShare(chatPanelId);
+              } else {
+                await this.startScreenShare(chatPanelId, sender, recipient);
+              }
+            });
+
+          $(document).on(
+            `click`,
+            `.close-chat-content[data-id="${chatPanelId}"]`,
+            () => {
+              this.cleanupScreenSharing(chatPanelId);
+            }
+          );
+        }
+
+        async startScreenShare(chatPanelId, sender, recipient) {
+          try {
+            console.log(`Starting screen share for ${chatPanelId}`);
+            $(`#screen-share-container-${chatPanelId}`).show();
+            this.updateConnectionStatus(chatPanelId, "connecting");
+            if (!(await this.createPeerConnection(chatPanelId))) {
+              throw new Error("Failed to create peer connection");
+            }
+            await this.createPeerConnection(chatPanelId);
+            this.localStreams[chatPanelId] =
+              await navigator.mediaDevices.getDisplayMedia({
+                video: {
+                  displaySurface: "monitor",
+                },
+                audio: false,
+              });
+            const localVideo = document.getElementById(
+              `localVideo-${chatPanelId}`
+            );
+            if (localVideo) {
+              localVideo.srcObject = this.localStreams[chatPanelId];
+              localVideo.classList.add("active");
+              localVideo
+                .play()
+                .catch((e) => console.log("Local video play error:", e));
+            }
+            this.localStreams[chatPanelId].getTracks().forEach((track) => {
+              this.peerConnections[chatPanelId].addTrack(
+                track,
+                this.localStreams[chatPanelId]
+              );
+              console.log(`Added ${track.kind} track to peer connection`);
+              track.onended = () => {
+                console.log("Screen sharing track ended");
+                this.stopScreenShare(chatPanelId);
+              };
+            });
+            this.localStreams[chatPanelId].getVideoTracks()[0].onended = () => {
+              console.log("User stopped screen sharing");
+              this.stopScreenShare(chatPanelId);
+            };
+
+            console.log(`Screen sharing started for ${chatPanelId}`);
+          } catch (error) {
+            console.error(`Error starting screen share: ${error}`);
+            this.stopScreenShare(chatPanelId);
+            if (error.name !== "NotAllowedError") {
+              this.showError(
+                chatPanelId,
+                `Could not start screen sharing: ${error.message}`
+              );
+            }
+          }
+        }
+
+        async createPeerConnection(chatPanelId) {
+          if (this.peerConnections[chatPanelId]) {
+            this.peerConnections[chatPanelId].close();
+            delete this.peerConnections[chatPanelId];
+          }
+
+          try {
+            console.log(`Creating PeerConnection for ${chatPanelId}`);
+            if (this.peerConnections[chatPanelId]) {
+              this.peerConnections[chatPanelId].close();
+            }
+            this.peerConnections[chatPanelId] = new RTCPeerConnection(
+              this.rtcConfig
+            );
+            this.updateConnectionStatus(chatPanelId, "connecting");
+            this.setupPeerConnectionHandlers(chatPanelId);
+            console.log(`PeerConnection created for ${chatPanelId}`);
+            return true;
+          } catch (error) {
+            console.error(`Error creating PeerConnection: ${error}`);
+            this.updateConnectionStatus(chatPanelId, "disconnected");
+            return false;
+          }
+        }
+
+        setupPeerConnectionHandlers(chatPanelId) {
+          const pc = this.peerConnections[chatPanelId];
+          if (!pc) return;
+          const [_, sender, recipient] =
+            chatPanelId.match(/chat-panel-(.+?)-(\d+)/) || [];
+          pc.onicecandidate = ({ candidate }) => {
+            console.log(`ICE candidate for ${chatPanelId}:`, candidate);
+            if (
+              candidate &&
+              this.shareSockets[chatPanelId]?.readyState === WebSocket.OPEN
+            ) {
+              this.shareSockets[chatPanelId].send(
+                JSON.stringify({
+                  type: "candidate",
+                  candidate: candidate,
+                })
+              );
+            }
+          };
+
+          pc.onnegotiationneeded = async () => {
+            try {
+              console.log(`Negotiation needed for ${chatPanelId}`);
+              this.makingOffer[chatPanelId] = true;
+              await pc.setLocalDescription();
+              console.log(`Local description set:`, pc.localDescription);
+
+              if (
+                this.shareSockets[chatPanelId]?.readyState === WebSocket.OPEN
+              ) {
+                this.shareSockets[chatPanelId].send(
+                  JSON.stringify({
+                    type: "offer",
+                    offer: pc.localDescription,
+                  })
+                );
+                console.log(`Offer sent for ${chatPanelId}`);
+              }
+            } catch (err) {
+              console.error(`Negotiation error for ${chatPanelId}:`, err);
+            } finally {
+              this.makingOffer[chatPanelId] = false;
+            }
+          };
+
+          pc.oniceconnectionstatechange = () => {
+            const state = pc.iceConnectionState;
+            console.log(
+              `ICE connection state changed to ${state} for ${chatPanelId}`
+            );
+            this.updateConnectionStatus(chatPanelId, state);
+            if (pc.iceConnectionState === "failed") {
+              pc.restartIce();
+            }
+            if (state === "failed") {
+              console.log(`Restarting ICE for ${chatPanelId}`);
+              pc.restartIce();
+            }
+          };
+          pc.ontrack = (event) => {
+            console.log("Track event received:", event);
+            const remoteVideo = document.getElementById(
+              `remoteVideo-${chatPanelId}`
+            );
+            if (!remoteVideo) {
+              console.error("Remote video element not found");
+              return;
+            }
+            if (remoteVideo.srcObject) {
+              remoteVideo.srcObject
+                .getTracks()
+                .forEach((track) => track.stop());
+            }
+            remoteVideo.playsInline = true;
+            remoteVideo.muted = true;
+
+            if (remoteVideo.srcObject) {
+              remoteVideo.srcObject
+                .getTracks()
+                .forEach((track) => track.stop());
+            }
+            if (event.streams && event.streams.length > 0) {
+              console.log(
+                "Attaching remote stream with tracks:",
+                event.streams[0].getTracks().map((t) => t.kind)
+              );
+
+              remoteVideo.srcObject = event.streams[0];
+              remoteVideo.playsInline = true;
+              remoteVideo.muted = true;
+              const playPromise = remoteVideo.play();
+              if (playPromise !== undefined) {
+                playPromise.catch((error) => {
+                  console.log("Autoplay prevented, showing play button");
+                  this.showPlayButton(chatPanelId, remoteVideo);
+                });
+              }
+              $(`#screen-share-container-${chatPanelId}`).show();
+              this.ensureVideoPlayback(remoteVideo, chatPanelId);
+            }
+          };
+          pc.onicegatheringstatechange = () => {
+            console.log(
+              `ICE gathering state for ${chatPanelId}: ${pc.iceGatheringState}`
+            );
+          };
+
+          pc.onsignalingstatechange = () => {
+            console.log(
+              `Signaling state for ${chatPanelId}: ${pc.signalingState}`
+            );
+          };
+
+          pc.onconnectionstatechange = () => {
+            const state = pc.connectionState;
+            console.log(
+              `Connection state changed to ${state} for ${chatPanelId}`
+            );
+
+            switch (state) {
+              case "connected":
+                this.handleConnectionSuccess(chatPanelId);
+                break;
+              case "failed":
+                setTimeout(() => {
+                  if (pc.iceConnectionState !== "closed") {
+                    pc.restartIce();
+                  }
+                }, 2000);
+                break;
+              case "disconnected":
+                this.cleanupScreenSharing(chatPanelId);
+                break;
+            }
+          };
+        }
+        handleConnectionSuccess(chatPanelId) {
+        console.log(`Connection established for ${chatPanelId}`);
+        const statusElement = document.getElementById(`connection-status-${chatPanelId}`);
+        if (statusElement) {
+            statusElement.className = "connection-status connected";
+          }
+        this.monitorConnectionQuality(chatPanelId);
+        }
+
+        monitorConnectionQuality(chatPanelId) {
+          const pc = this.peerConnections[chatPanelId];
+          if (!pc) return;
+            setInterval(() => {
+              pc.getStats().then(stats => {
+                stats.forEach(report => {
+                    if (report.type === 'candidate-pair' && report.nominated) {
+                        console.log(`Connection quality for ${chatPanelId}:`, {
+                            rtt: report.currentRoundTripTime,
+                            availableOutgoingBitrate: report.availableOutgoingBitrate
+                        });
+                    }
+                });
+            });
+          }, 1000);
+        }
+        handleConnectionFailure(chatPanelId) {
+          this.cleanupScreenSharing(chatPanelId);
+
+          const { sender, recipient } = this.peerData[chatPanelId] || {};
+          if (!sender || !recipient) return;
+          if (sender && recipient) {
+            setTimeout(() => {
+              this.initScreenSharing(chatPanelId, sender, recipient);
+            }, 2000);
+          }
+        }
+        ensureVideoPlayback(videoElement, chatPanelId, attempt = 0) {
+          if (attempt > 3) {
+            console.error("Max playback attempts reached");
+            this.showPlayButton(chatPanelId, videoElement);
+            return;
+          }
+
+          videoElement
+            .play()
+            .then(() => {
+              console.log("Video playback started successfully");
+              videoElement.classList.add("active");
+            })
+            .catch((error) => {
+              console.warn(`Playback attempt ${attempt + 1} failed:`, error);
+              if (error.name === "NotAllowedError") {
+                this.showPlayButton(chatPanelId, videoElement);
+              } else {
+                setTimeout(() => {
+                  this.ensureVideoPlayback(
+                    videoElement,
+                    chatPanelId,
+                    attempt + 1
+                  );
+                }, 500);
+              }
+            });
+        }
+        handleVideoPlayback(videoElement, chatPanelId) {
+          videoElement.muted = true;
+          const playPromise = videoElement.play();
+          if (playPromise !== undefined) {
+            playPromise
+              .catch((error) => {
+                console.log("Autoplay prevented, showing play button");
+                this.showPlayButton(chatPanelId, videoElement);
+              })
+              .then(() => {
+                console.log("Video playback started successfully");
+              });
+          }
+        }
+
+        showPlayButton(chatPanelId, videoElement) {
+          const container = document.getElementById(
+            `screen-share-container-${chatPanelId}`
+          );
+          if (!container) return;
+          const existingBtn = container.querySelector(".video-play-button");
+          if (existingBtn) existingBtn.remove();
+          const playBtn = document.createElement("button");
+          playBtn.className = "video-play-button btn btn-primary";
+          playBtn.textContent = "Play Video";
+          playBtn.onclick = () => {
+            videoElement
+              .play()
+              .then(() => {
+                playBtn.remove();
+                console.log("Playback started after user interaction");
+              })
+              .catch((e) => {
+                console.error("Playback failed:", e);
+                this.showError(chatPanelId, "Could not start video playback");
+              });
+          };
+
+          container.appendChild(playBtn);
+        }
+
+        async processSignalingMessage(chatPanelId, data) {
+          if (!this.peerConnections[chatPanelId]) {
+            console.log(`PeerConnection not ready, queuing ${data.type}`);
+            this.queueMessage(chatPanelId, data);
+            return;
+          }
+
+          const pc = this.peerConnections[chatPanelId];
+          const currentDescription =
+            pc.remoteDescription || pc.localDescription;
+
+          if (currentDescription && data.type === currentDescription.type) {
+            console.log(`Ignoring duplicate ${data.type}`);
+            return;
+          }
+          switch (data.type) {
+            case "offer":
+              await this.handleOffer(chatPanelId, data.offer);
+              break;
+            case "answer":
+              await this.handleAnswer(chatPanelId, data.answer);
+              break;
+            case "candidate":
+              await this.handleCandidate(chatPanelId, data.candidate);
+              break;
+            case "stop_screen_share":
+              await this.stopScreenShare(chatPanelId);
+              break;
+          }
+        }
+        async handleOffer(chatPanelId, offer) {
+          try {
+            const pc = this.peerConnections[chatPanelId];
+            if (!pc) return;
+
+            const offerCollision =
+              this.makingOffer[chatPanelId] ||
+              (pc.signalingState !== "stable" &&
+                pc.signalingState !== "have-local-offer");
+
+            this.ignoreOffer[chatPanelId] =
+              !this.polite[chatPanelId] && offerCollision;
+            if (this.ignoreOffer[chatPanelId]) {
+              console.log(`Ignoring offer for ${chatPanelId} due to collision`);
+              return;
+            }
+            this.messageQueue[chatPanelId] = [];
+
+            await pc.setRemoteDescription(new RTCSessionDescription(offer));
+
+            if (offer.type === "offer") {
+              await pc.setLocalDescription();
+              this.shareSockets[chatPanelId].send(
+                JSON.stringify({
+                  type: "answer",
+                  answer: pc.localDescription,
+                })
+              );
+            }
+          } catch (error) {
+            console.error(`Error handling offer: ${error}`);
+            this.cleanupScreenSharing(chatPanelId);
+          }
+        }
+        async handleAnswer(chatPanelId, answer) {
+          try {
+            console.log("Processing answer", answer);
+            const pc = this.peerConnections[chatPanelId];
+
+            if (!pc || pc.signalingState === "closed") {
+              console.warn("PeerConnection not ready for answer");
+              return;
+            }
+
+            if (
+              pc.signalingState === "have-local-offer" ||
+              pc.signalingState === "stable"
+            ) {
+              if (!pc.remoteDescription) {
+                await pc.setRemoteDescription(
+                  new RTCSessionDescription(answer)
+                );
+                console.log("Answer processed successfully");
+              } else {
+                console.log("Ignoring duplicate answer");
+              }
+            } else {
+              console.warn(
+                `Unexpected signaling state for answer: ${pc.signalingState}`
+              );
+              this.queueMessage(chatPanelId, { type: "answer", answer });
+            }
+          } catch (error) {
+            console.error("Error handling answer:", error);
+            throw error;
+          }
+        }
+        async handleCandidate(chatPanelId, candidate) {
+          try {
+            const pc = this.peerConnections[chatPanelId];
+            if (!pc || pc.signalingState === "closed") return;
+            if (!candidate || this.ignoreOffer[chatPanelId]) return;
+            if (
+              candidate.candidate.includes("typ host") &&
+              pc.remoteDescription &&
+              pc.remoteDescription.type === "answer"
+            ) {
+              console.log("Skipping host candidate after answer");
+              return;
+            }
+            await pc.addIceCandidate(new RTCIceCandidate(candidate));
+          } catch (err) {
+            if (!this.ignoreOffer[chatPanelId]) {
+              console.error("Failed to add ICE candidate:", err);
+            }
+          }
+        }
+        async stopScreenShare(chatPanelId) {
+          try {
+            console.log(`Stopping screen share for ${chatPanelId}`);
+            if (this.localStreams[chatPanelId]) {
+              this.localStreams[chatPanelId]
+                .getTracks()
+                .forEach((track) => track.stop());
+              delete this.localStreams[chatPanelId];
+            }
+            const localVideo = document.getElementById(
+              `localVideo-${chatPanelId}`
+            );
+            const remoteVideo = document.getElementById(
+              `remoteVideo-${chatPanelId}`
+            );
+            if (localVideo) {
+              localVideo.srcObject = null;
+              localVideo.classList.remove("active");
+            }
+            if (remoteVideo) {
+              remoteVideo.srcObject = null;
+              remoteVideo.classList.remove("active");
+            }
+            if (this.peerConnections[chatPanelId]) {
+              this.peerConnections[chatPanelId].close();
+              delete this.peerConnections[chatPanelId];
+            }
+            $(`#screen-share-container-${chatPanelId}`).hide();
+            this.updateConnectionStatus(chatPanelId, "disconnected");
+            if (this.shareSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
+              this.shareSockets[chatPanelId].send(
+                JSON.stringify({
+                  type: "stop_screen_share",
+                })
+              );
+            }
+
+            console.log(`Screen sharing stopped for ${chatPanelId}`);
+          } catch (error) {
+            console.error(`Error stopping screen share: ${error}`);
+          }
+        }
+
+        cleanupScreenSharing(chatPanelId) {
+          if (this.shareSockets[chatPanelId]) {
+            this.shareSockets[chatPanelId].close();
+            delete this.shareSockets[chatPanelId];
+          }
+          if (this.peerConnections[chatPanelId]) {
+            this.peerConnections[chatPanelId].close();
+            delete this.peerConnections[chatPanelId];
+          }
+          if (this.localStreams[chatPanelId]) {
+            this.localStreams[chatPanelId]
+              .getTracks()
+              .forEach((track) => track.stop());
+            delete this.localStreams[chatPanelId];
+          }
+          const container = document.getElementById(
+            `screen-share-container-${chatPanelId}`
+          );
+          if (container) {
+            container.style.display = "none";
+          }
+        }
+
+        cleanupSocket(chatPanelId) {
+          if (this.shareSockets[chatPanelId]) {
+            this.shareSockets[chatPanelId].close();
+            delete this.shareSockets[chatPanelId];
+          }
+        }
+
+        async processMessageQueue(chatPanelId) {
+          if (
+            !this.messageQueue[chatPanelId] ||
+            this.messageQueue[chatPanelId].length === 0
+          ) {
+            return;
+          }
+
+          console.log(
+            `Processing ${this.messageQueue[chatPanelId].length} queued messages for ${chatPanelId}`
+          );
+
+          while (
+            this.messageQueue[chatPanelId].length > 0 &&
+            this.isPeerConnectionReady(chatPanelId)
+          ) {
+            const message = this.messageQueue[chatPanelId].shift();
+            try {
+              await this.processSignalingMessage(chatPanelId, message);
+            } catch (error) {
+              console.error(`Error processing queued ${message.type}:`, error);
+            }
+          }
+        }
+
+        queueMessage(chatPanelId, message) {
+          if (!this.messageQueue[chatPanelId]) {
+            this.messageQueue[chatPanelId] = [];
+          }
+          this.messageQueue[chatPanelId].push(message);
+          console.log(`Message queued for ${chatPanelId}:`, message.type);
+        }
+
+        updateConnectionStatus(chatPanelId, state) {
+          const element = document.getElementById(
+            `connection-status-${chatPanelId}`
+          );
+          if (!element) {
+            console.warn(`Status element not found for ${chatPanelId}`);
+            return;
+          }
+
+          element.className = "connection-status";
+          const stateMap = {
+            connected: "connected",
+            completed: "connected",
+            checking: "connecting",
+            connecting: "connecting",
+            disconnected: "disconnected",
+            failed: "disconnected",
+            closed: "disconnected",
+          };
+
+          const statusClass = stateMap[state] || "disconnected";
+          element.classList.add(statusClass);
+          element.title = `Status: ${state}`;
+        }
+
+        showError(chatPanelId, message) {
+          console.error(`Error for ${chatPanelId}: ${message}`);
+          alert(`Screen Sharing Error: ${message}`);
+        }
+
+        isValidMessageType(type) {
+          const validTypes = [
+            "offer",
+            "answer",
+            "candidate",
+            "stop_screen_share",
+          ];
+          return validTypes.includes(type);
+        }
+
+        isPeerConnectionReady(chatPanelId) {
+          return (
+            this.peerConnections[chatPanelId] &&
+            this.peerConnections[chatPanelId].signalingState !== "closed"
+          );
+        }
+      }
+
+      const screenSharing = new ScreenSharing();
+
+      var onlineSocket = new WebSocket(
+        "ws://" + window.location.host + "/ws/online/"
+      );
+      onlineSocket.onmessage = function (event) {
+        var data = JSON.parse(event.data);
+        if (data.type === "update_online_users") {
+          updateOnlineUserList(data.online_users);
+        }
+      };
+      function updateOnlineUserList(onlineUsers) {
+        document.querySelectorAll(".user-status").forEach((element) => {
+          element.classList.remove("online");
+          element.classList.add("offline");
+        });
+        onlineUsers.forEach((user) => {
+          let userElement = document.getElementById(
+            "user-status-" + user.user__id
+          );
+          if (userElement) {
+            userElement.classList.remove("offline");
+            userElement.classList.add("online");
+          }
+        });
+      }
+      document.querySelector(".menu-toggle").addEventListener("click", () => {
+        document.querySelector(".nav-menu").classList.toggle("active");
+      });
+      $(document).ready(function () {
+        let chatPanels = [];
+
+        $(".chat-button").click(function () {
+          $(".chat-panel").toggleClass("active");
+          updateChatPanelPositions();
+        });
+        $(".close-chat").click(function () {
+          $(".chat-panel").removeClass("active");
+          updateChatPanelPositions();
+        });
+        let panelOffset = 0;
+        function updateNavigationControls(showControls) {
+            $('.chat-navigation-controls').remove();
+            const visiblePanels = chatPanels.filter(id => !$(`#${id}`).hasClass('minimized'));
+            const maxVisible = 3;
+            if (visiblePanels.length > maxVisible) {
+                const controls = $(`
+                    <div class="chat-navigation-controls">
+                        <button class="nav-prev" ${panelOffset === 0 ? 'disabled' : ''}><</button>
+                        <span class="nav-status">${Math.min(panelOffset + 1, visiblePanels.length - maxVisible + 1)}/${visiblePanels.length - maxVisible + 1}</span>
+                        <button class="nav-next" ${panelOffset >= visiblePanels.length - maxVisible ? 'disabled' : ''}>></button>
+                    </div>
+                `);
+                $('body').append(controls);
+                controls.css({
+                    position: 'fixed',
+                    bottom: '200px',
+                    left: '120px',
+                    zIndex: 1100,
+                    display: 'flex',
+                    gap: '5px',
+                    alignItems: 'center'
+                });
+                controls.find('button').css({
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '50%',
+                    background: '#4e73df',
+                    color: 'white',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold'
+                });
+                controls.find('button:disabled').css({
+                    opacity: '0.5',
+                    cursor: 'not-allowed'
+                });
+                controls.find('.nav-status').css({
+                    fontSize: '12px',
+                    padding: '0 5px'
+                });
+                controls.find('.nav-prev').click(() => navigatePanels(-1));
+                controls.find('.nav-next').click(() => navigatePanels(1));
+            }
+        }
+        function navigatePanels(direction) {
+            const visiblePanels = chatPanels.filter(id => !$(`#${id}`).hasClass('minimized'));
+            const maxVisible = 3;
+            const totalPanels = visiblePanels.length;
+            panelOffset = Math.max(0, Math.min(panelOffset + direction, totalPanels - maxVisible));
+            const startIndex = panelOffset;
+            const endIndex = startIndex + maxVisible;
+            const panelsToShow = visiblePanels.slice(startIndex, endIndex);
+            const chatListPanelOpen = $('.chat-panel').hasClass('active');
+            const startRight = chatListPanelOpen ? 310 : 20;
+            const panelWidth = 300;
+            const gap = 8;
+            visiblePanels.forEach(panelId => {
+                $(`#${panelId}`).css({
+                    display: 'none'
+                });
+            });
+            panelsToShow.forEach((panelId, index) => {
+                const position = startRight + (index * (panelWidth + gap));
+                $(`#${panelId}`).css({
+                    right: position + 'px',
+                    display: 'block',
+                    zIndex: 1030 + index
+                });
+            });
+            updateNavigationControls(totalPanels > maxVisible);
+        }
+        function updateChatPanelPositions() {
+            const chatListPanelOpen = $('.chat-panel').hasClass('active');
+            const visiblePanels = chatPanels.filter(id => !$(`#${id}`).hasClass('minimized'));
+            if (visiblePanels.length <= 3) {
+                panelOffset = 0;
+            }
+            const startRight = chatListPanelOpen ? 310 : 20;
+            const panelWidth = 300;
+            const gap = 8;
+            const maxVisible = 3;
+            const panelsToShow = visiblePanels.slice(panelOffset, panelOffset + maxVisible);
+            visiblePanels.forEach(panelId => {
+                $(`#${panelId}`).css({
+                    display: 'none'
+                });
+            });
+            panelsToShow.forEach((panelId, index) => {
+                const position = startRight + (index * (panelWidth + gap));
+                $(`#${panelId}`).css({
+                    right: position + 'px',
+                    display: 'block',
+                    zIndex: 1030 + index
+                });
+            });
+            updateNavigationControls(visiblePanels.length > maxVisible);
+        }
+        $(".chat-list li").click(function () {
+          let username = $(this).data("username");
+          let userId = $(this).data("id");
+          let chatPanelId = "chat-panel-" + username + "-" + userId;
+          let sender = "{{ request.user.username }}";
+          let recipient = username;
+          let chatMessages = "${chat-messages}";
+          let existingIndex = chatPanels.indexOf(chatPanelId);
+          let typingTimeout;
+          let isTyping = false;
+          const TYPING_TIMEOUT = 5000;
+          if (existingIndex >= 0) {
+            chatPanels.splice(existingIndex, 1);
+            chatPanels.unshift(chatPanelId);
+            $(`#${chatPanelId}`).addClass("active");
+            bringPanelToFront(chatPanelId);
+            markMessagesAsRead(username);
+            updateChatPanelPositions();
+            return;
+          }
+          console.log("Chat Panel", chatPanelId);
+          loadOldMessages(sender, recipient, chatMessages, chatPanelId);
+
+          let chatPanel = $(`
+            <div class="chat-content-panel" id="${chatPanelId}">
+                <div class="chat-header" style="font-family: serif;">
+                    ${username}
+                    <div>
+                        <button class="minimize-chat" data-id="${chatPanelId}">−</button>
+                        <button class="maximize-chat" data-id="${chatPanelId}">□</button>
+                        <button class="close-chat-content" data-id="${chatPanelId}">&times;</button>
+                    </div>
+                </div>
+                <div class="chat-container">
+                    <div class="container">
+                        <div class="chat-container2">
+                            <div class="messages" id="chat-messages-${chatPanelId}" class="chat-messages"></div>
+                            <div class="typing-indicator-container">
+                                <div class="typing-indicator" id="typing-indicator-${chatPanelId}">
+                                    <div class="typing-dots">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                    </div>
+                                    <span>typing...</span>
+                                </div>
+                            </div>
+                            <div class="screen-share-container" id="screen-share-container-${chatPanelId}" style="display: none;">
+                                <video id="localVideo-${chatPanelId}" class="localVideo" autoplay muted></video>
+                                <video id="remoteVideo-${chatPanelId}" class="remoteVideo" autoplay></video>
+                            </div>
+                        </div>
+                        <div class="chat-input" id="chat-input">
+                            <input autocomplete="off" type="text" class="message-input" id="message-input-${chatPanelId}" placeholder="Type your message...">
+                            <button id="send-btn-${chatPanelId}" class="send-btn">
+                                <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=000000" alt="send">
+                            </button>
+                            <button id="shareBtn-${chatPanelId}" class="shareBtn">
+                                <img src="https://img.icons8.com/?size=100&id=IId2iYTrumrQ&format=png&color=000000" alt="share">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `);
+          $("body").append(chatPanel);
+          chatPanels.push(chatPanelId);
+          $(`#${chatPanelId}`).addClass("active");
+          console.log("Initializing chat WebSocket...");
+          console.log(sender, recipient);
+          bringPanelToFront(chatPanelId);
+          markMessagesAsRead(username);
+
+          let chatSocket = new WebSocket(
+            `ws://${window.location.host}/ws/chat/${sender}/${recipient}/`
+          );
+
+          $(document).on("click", `#send-btn-${chatPanelId}`, function () {
+            markMessagesAsRead(username)
+            sendMessage(chatSocket, chatPanelId);
+          });
+          $(`#message-input-${chatPanelId}`).keypress(function (event) {
+            markMessagesAsRead(username)
+            if (event.key === "Enter") sendMessage(chatSocket, chatPanelId);
+          });
+          $(`#message-input-${chatPanelId}`).on('input', function() {
+            const message = $(this).val().trim();
+            if (message.length > 0) {
+                if (!isTyping) {
+                    isTyping = true;
+                    chatSocket.send(JSON.stringify({
+                        type: "typing",
+                        sender: "{{ request.user.username }}",
+                        recipient: username
+                    }));
+                }
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(stopTyping, TYPING_TIMEOUT);
+            } else {
+                stopTyping();
+            }
+          });
+          function stopTyping() {
+            if (isTyping) {
+                isTyping = false;
+                clearTimeout(typingTimeout);
+                chatSocket.send(JSON.stringify({
+                    type: "stopped_typing",
+                    sender: "{{ request.user.username }}",
+                    recipient: username
+                }));
+            }
+          }
+          function sendMessage(chatSocket, chatPanelId) {
+            const messageInput = $(`#message-input-${chatPanelId}`);
+            const message = messageInput.val().trim();
+            if (!message) return;
+            chatSocket.send(JSON.stringify({ message: message }));
+            messageInput.val("");
+          }
+
+          $(document).on("click", ".close-chat-content", function () {
+            let panelId = $(this).data("id");
+            $("#" + panelId).remove();
+            chatPanels = chatPanels.filter((id) => id !== panelId);
+            updateChatPanelPositions();
+          });
+          function bringPanelToFront(panelId) {
+            let panel = $("#" + panelId);
+            panel.css(
+              "z-index",
+              Math.max(...chatPanels.map((id) => $("#" + id).css("z-index"))) +
+                1
+            );
+          }
+
+          chatSocket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            if (data.type === "typing" && data.sender !== "{{ request.user.username }}") {
+                const indicator = $(`#typing-indicator-${chatPanelId}`);
+                indicator.find('span').text(`${data.sender} is typing...`);
+                indicator.addClass('show');
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    indicator.removeClass('show');
+                }, TYPING_TIMEOUT);
+            }
+            else if (data.type === "stopped_typing" && data.sender !== "{{ request.user.username }}") {
+                $(`#typing-indicator-${chatPanelId}`).removeClass('show');
+            }
+            else if (data.message) {
+                $(`#typing-indicator-${chatPanelId}`).removeClass('show');
+                renderMessage(data, chatPanelId);
+                if (!document.hasFocus() || $(`#${chatPanelId}`).hasClass('minimized') || !$(`#${chatPanelId}`).is(':visible')) {
+                    tabNotifier.showNotification(`${data.sender}: ${data.message}`);
+                }
+            }
+          };
+          $(document).on('click', '.maximize-chat', function() {
+          const panelId = $(this).data('id');
+          const panel = $(`#${panelId}`);
+          panel.toggleClass('maximized');
+          markMessagesAsRead(username);
+          const button = $(this);
+          if (panel.hasClass('maximized')) {
+              button.text('❐');
+          } else {
+              button.text('□');
+          }
+          if (panel.hasClass('maximized')) {
+              panel.css('z-index', '1100');
+          } else {
+              panel.css('z-index', '1030');
+          }
+          if (panel.hasClass('maximized')) {
+              $(`#screen-share-container-${panelId}`).css('height', '50%');
+          } else {
+              $(`#screen-share-container-${panelId}`).css('height', 'auto');
+          }
+         });
+         $(document).on('click', '.minimize-chat', function() {
+            const panelId = $(this).data('id');
+            const panel = $(`#${panelId}`);
+            panel.toggleClass('minimized');
+            bringPanelToFront(panelId);
+        });
+        $(document).on('click', '.chat-content-panel.minimized .chat-header', function() {
+            const panel = $(this).closest('.chat-content-panel');
+            panel.removeClass('minimized');
+            markMessagesAsRead(username);
+            bringPanelToFront(panel.attr('id'));
+        });
+          function renderMessage(data, chatPanelId) {
+            const chatMessages = $(`#chat-messages-${chatPanelId}`);
+            let chatPanel = $("#" + chatPanelId);
+            const newMessage = `
+        <div class="message-container ${
+          data.sender === "{{ request.user.username }}" ? "me" : "other"
+        }">
+            <div class="message-bubble">
+                <div class="username">${data.sender}</div>
+                <div class="message-content">${data.message || ""}</div>
+                <div class="message-timestamp">${new Date().toLocaleTimeString()}</div>
+            </div>
+        </div>`;
+            chatMessages.append(newMessage);
+            chatMessages.scrollTop(chatMessages.prop("scrollHeight"));
+          }
+          updateChatPanelPositions();
+          markMessagesAsRead(username);
+        });
+        $(document).on('click', '.chat-content-panel', function() {
+          tabNotifier.clearNotifications();
+        });
+
+        $(window).on('focus', function() {
+          tabNotifier.clearNotifications();
+        });
+        function loadOldMessages(sender, recipient, chatMessages, chatPanelId) {
+          $.ajax({
+            url: `/load-messages/${sender}/${recipient}/`,
+            type: "GET",
+            success: function (data) {
+              const chatMessages = $(
+                `#${chatPanelId} #chat-messages-${chatPanelId}`
+              );
+              data.messages.forEach((msg) => {
+                const newMessage = `
+                        <div class="message-container ${
+                          msg.sender === sender ? "me" : "other"
+                        }">
+                            <div class="message-bubble">
+                                <div class="username">${msg.sender}</div>
+                                <div class="message-content">${
+                                  msg.content
+                                }</div>
+                                <div class="message-timestamp">${
+                                  msg.timestamp
+                                }</div>
+                            </div>
+                        </div>`;
+                chatMessages.append(newMessage);
+              });
+              chatMessages.scrollTop(chatMessages.prop("scrollHeight"));
+            },
+            error: function (error) {
+              console.error("Error loading messages:", error);
+            },
+          });
+        }
+
+        $(document).on("click", ".close-chat-content", function () {
+          let panelId = $(this).data("id");
+          $("#" + panelId).remove();
+          chatPanels = chatPanels.filter((id) => id !== panelId);
+        });
+
+        var notificationSocket = new WebSocket(
+          "ws://" + window.location.host + "/ws/notifications/"
+        );
+        notificationSocket.onmessage = function (event) {
+          var data = JSON.parse(event.data);
+          if (data.type === "unread_count") {
+            updateUnreadCounts(data.unread_counts);
+          }
+        };
+
+        function markMessagesAsRead(username) {
+          $.ajax({
+            url: "/mark-as-read/",
+            type: "POST",
+            data: {
+              username: username,
+              csrfmiddlewaretoken: "{{ csrf_token }}",
+            },
+            success: function (response) {
+              $("#notification-badge-" + username).hide();
+              $("#chat-notification").hide();
+            },
+          });
+        }
+        $(".chat-list li").click(function () {
+          const username = $(this).data("username");
+          const userId = $(this).data("id");
+          const chatPanelId = `chat-panel-${username}-${userId}`;
+          const sender = "{{ request.user.username }}";
+          const recipient = username;
+          if (!document.getElementById(`connection-status-${chatPanelId}`)) {
+            $(`#${chatPanelId} .chat-header`).append(
+              `<div class="connection-status" id="connection-status-${chatPanelId}"></div>`
+            );
+          }
+          screenSharing.initScreenSharing(chatPanelId, sender, recipient);
+        });
+        function updateUnreadCounts(unreadCounts) {
+          let userItems = document.querySelectorAll(".chat-list li");
+          userItems.forEach((item) => {
+            let username = item.getAttribute("data-username");
+            let unreadCount = unreadCounts[username] || 0;
+            let badge = document.getElementById(
+              "notification-badge-" + username
+            );
+            if (badge) {
+              badge.innerText = unreadCount;
+              badge.style.display = unreadCount > 0 ? "inline-block" : "none";
+            }
+          });
+          let totalUnread = Object.values(unreadCounts).reduce(
+            (sum, count) => sum + count,
+            0
+          );
+          if (totalUnread > 0) {
+            $("#chat-notification").show();
+          } else {
+            $("#chat-notification").hide();
+          }
+        }
+      });
+      function updateFavicon(count) {
+        return new Promise((resolve) => {
+          const canvas = document.createElement('canvas');
+          const size = 34;
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          const drawDefaultIcon = () => {
+            ctx.fillStyle = '#6c5ce7';
+            ctx.fillRect(0, 0, size, size);
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('C', size/2, size/2);
+            drawNotificationBadge(count);
+          };
+
+          const drawNotificationBadge = (count) => {
+            if (count > 0) {
+              ctx.fillStyle = '#ff4757';
+              ctx.beginPath();
+              ctx.arc(size - 8, 8, 8, 0, 2 * Math.PI);
+              ctx.fill();
+              ctx.fillStyle = 'white';
+              ctx.font = 'bold 15px Arial';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillText(count > 9 ? '9+' : count.toString(), size - 8, 8);
+            }
+            updateFaviconElement(canvas);
+            resolve();
+          };
+          const updateFaviconElement = (canvas) => {
+            const oldLinks = document.querySelectorAll('link[rel~="icon"]');
+            oldLinks.forEach(oldLink => document.head.removeChild(oldLink));
+            const link = document.createElement('link');
+            link.type = 'image/png';
+            link.rel = 'icon';
+            link.href = canvas.toDataURL('image/png');
+            document.head.appendChild(link);
+          };
+          const img = new Image();
+          img.crossOrigin = 'Anonymous';
+          img.src = '{% static "img/image01.png" %}?' + new Date().getTime();
+
+          img.onload = () => {
+            const ratio = Math.min(size / img.width, size / img.height);
+            const width = img.width * ratio;
+            const height = img.height * ratio;
+            ctx.drawImage(img, (size - width) / 2, (size - height) / 2, width, height);
+            drawNotificationBadge(count);
+          };
+
+          img.onerror = () => {
+            console.log('Using fallback favicon');
+            drawDefaultIcon();
+          };
+        });
+      }
+
+      class TabNotifier {
+        constructor() {
+          this.originalTitle = document.title;
+          this.notificationCount = 0;
+          this.blinkInterval = null;
+          this.isWindowFocused = true;
+          window.addEventListener('focus', () => {
+            this.isWindowFocused = true;
+            this.clearNotifications();
+          });
+
+          window.addEventListener('blur', () => {
+            this.isWindowFocused = false;
+          });
+        }
+
+        async showNotification(message = null) {
+          if (this.isWindowFocused) return;
+          this.notificationCount++;
+          this.updateTitle();
+          await updateFavicon(this.notificationCount);
+          if (Notification.permission !== "granted") {
+            Notification.requestPermission().then(permission => {
+              if (permission === "granted" && message) {
+                new Notification('New message', {
+                  body: message,
+                  icon: '{% static "img/ProfilePic.png" %}'
+                });
+              }
+            });
+          } else if (message) {
+            new Notification('New message', {
+              body: message,
+              icon: '{% static "img/ProfilePic.png" %}'
+            });
+          }
+          if (!this.blinkInterval) {
+            this.startBlinking();
+          }
+        }
+        async clearNotifications() {
+          this.notificationCount = 0;
+          document.title = this.originalTitle;
+          await updateFavicon(0);
+          if (this.blinkInterval) {
+            clearInterval(this.blinkInterval);
+            this.blinkInterval = null;
+          }
+        }
+        updateTitle() {
+          document.title = `(${this.notificationCount}) ${this.originalTitle}`;
+        }
+        startBlinking() {
+          let showOriginal = true;
+          this.blinkInterval = setInterval(() => {
+            document.title = showOriginal
+              ? `(${this.notificationCount}) New message!`
+              : `(${this.notificationCount}) ${this.originalTitle}`;
+            showOriginal = !showOriginal;
+          }, 1000);
+        }
+      }
+      const tabNotifier = new TabNotifier();
+    </script>
+  </body>
+</html>

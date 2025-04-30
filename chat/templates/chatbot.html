@@ -1,0 +1,435 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ari Chatbot</title>
+    <style>
+        .chatbot-button {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background-color: #4e73df;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 50%;
+            font-size: 18px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .chatbot-button:hover {
+            background-color: #375ab5;
+            transform: scale(1.1);
+        }
+        .chatbot-panel {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 320px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        .chatbot-header {
+            background-color: #4e73df;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chatbot-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .chatbot-close-btn:hover {
+            transform: scale(1.2);
+        }
+        .chatbot-body {
+            padding: 12px;
+            height: 300px;
+            overflow-y: auto;
+            background: linear-gradient(to bottom, #f8f9fc, #e3e6f0);
+            display: flex;
+            flex-direction: column;
+        }
+        .chatbot-footer {
+            display: flex;
+            padding: 12px;
+            border-top: 1px solid #ddd;
+            background: white;
+        }
+        .chatbot-footer input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: border 0.3s;
+        }
+        .chatbot-footer input:focus {
+            border-color: #4e73df;
+        }
+        .chatbot-footer button {
+            background: #4e73df;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin-left: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .chatbot-footer button:hover {
+            background-color: #375ab5;
+            transform: scale(1.05);
+        }
+        .chatbot-message {
+            max-width: 85%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            margin: 6px 0;
+            font-size: 14px;
+            word-wrap: break-word;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chatbot-user-message {
+            align-self: flex-end;
+            background: linear-gradient(to right, #4e73df, #1e40af);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        .bot-message {
+            align-self: flex-start;
+            background: linear-gradient(to right, #8a2be2, #5b21b6);
+            color: white;
+            border-bottom-left-radius: 5px;
+        }
+        .feedback-buttons {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 8px;
+            gap: 6px;
+        }
+        .feedback-btn {
+            background: none;
+            border: 1px solid;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .helpful-btn {
+            color: #4CAF50;
+            border-color: #4CAF50;
+        }
+        .helpful-btn:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .not-helpful-btn {
+            color: #F44336;
+            border-color: #F44336;
+        }
+        .not-helpful-btn:hover {
+            background-color: #F44336;
+            color: white;
+        }
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding-left: 5px;
+        }
+        .typing-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            animation: typing 1.2s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .timestamp {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 3px;
+            text-align: right;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <button id="chatbot-btn" class="chatbot-button" aria-label="Open Chatbot">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+    <div id="chatbot-panel" class="chatbot-panel">
+        <div class="chatbot-header">
+            <span>Ari</span>
+            <button id="chatbot-close-btn" class="chatbot-close-btn" aria-label="Close Chatbot">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chatbot-body" id="chatbot-body"></div>
+        <div class="chatbot-footer">
+            <input type="text" id="chatbot-input" placeholder="Type your message here..." aria-label="Type your message">
+            <button id="chatbot-send-btn" aria-label="Send Message">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let conversationHistory = [];
+        let currentBotMessageId = null;
+        const chatBtn = document.getElementById('chatbot-btn');
+        const chatPanel = document.getElementById('chatbot-panel');
+        const chatBody = document.getElementById('chatbot-body');
+        const chatInput = document.getElementById('chatbot-input');
+        const sendBtn = document.getElementById('chatbot-send-btn');
+        const closeBtn = document.getElementById('chatbot-close-btn');
+        chatBtn.addEventListener('click', toggleChatPanel);
+        closeBtn.addEventListener('click', closeChatPanel);
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        function toggleChatPanel() {
+            chatPanel.style.display = chatPanel.style.display === 'block' ? 'none' : 'block';
+            if (chatPanel.style.display === 'block' && !chatBody.dataset.greeted) {
+                showTypingIndicator();
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    addBotMessage("Hello! I'm Ari your AI assistant. How can I help you today?");
+                    chatBody.dataset.greeted = "true";
+                }, 1500);
+            }
+        }
+        function closeChatPanel() {
+            chatPanel.style.display = 'none';
+        }
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            addUserMessage(message);
+            conversationHistory.push({
+                sender: 'user',
+                message: message,
+                timestamp: new Date().toISOString()
+            });
+            
+            chatInput.value = '';
+            showTypingIndicator();            
+            fetch(`/get-response/?message=${encodeURIComponent(message)}`)
+                .then(handleResponse)
+                .catch(handleError);
+        }
+        function handleResponse(response) {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json().then(data => {
+                removeTypingIndicator();
+                if (data.response) {
+                    currentBotMessageId = 'msg-' + Date.now();
+                    addBotMessage(data.response, currentBotMessageId);
+                    conversationHistory.push({
+                        sender: 'bot',
+                        message: data.response,
+                        messageId: currentBotMessageId,
+                        timestamp: new Date().toISOString()
+                    });
+                } else {
+                    throw new Error('No response from chatbot');
+                }
+            });
+        }
+        function handleError(error) {
+            console.error("Error:", error);
+            removeTypingIndicator();
+            currentBotMessageId = 'msg-' + Date.now();
+            addBotMessage("I'm having trouble understanding. Could you rephrase?", currentBotMessageId);
+            conversationHistory.push({
+                sender: 'bot',
+                message: "I'm having trouble understanding. Could you rephrase?",
+                messageId: currentBotMessageId,
+                timestamp: new Date().toISOString()
+            });
+        }
+        function addUserMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chatbot-message', 'chatbot-user-message');
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            messageDiv.innerHTML = `
+                <div>${text}</div>
+                <div class="timestamp">${time}</div>
+            `;
+            
+            chatBody.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        function addBotMessage(text, messageId) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chatbot-message', 'bot-message');
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            messageDiv.innerHTML = `
+                <div>${text}</div>
+                <div class="timestamp">${time}</div>
+            `;
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = 'feedback-buttons';
+            feedbackDiv.innerHTML = `
+                <small>Was this helpful?</small>
+                <button class="feedback-btn helpful-btn" onclick="handleFeedback('${messageId}', true)">
+                    <i class="fas fa-thumbs-up"></i> Yes
+                </button>
+                <button class="feedback-btn not-helpful-btn" onclick="handleFeedback('${messageId}', false)">
+                    <i class="fas fa-thumbs-down"></i> No
+                </button>
+            `;
+            
+            messageDiv.appendChild(feedbackDiv);
+            chatBody.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        window.handleFeedback = function(messageId, isHelpful) {
+            const messageIndex = conversationHistory.findIndex(msg => msg.messageId === messageId);
+            if (messageIndex === -1) return;
+            conversationHistory[messageIndex].feedback = isHelpful ? 'helpful' : 'not_helpful';
+            const feedbackData = {
+                message_id: messageId,
+                message: conversationHistory[messageIndex].message,
+                feedback: isHelpful ? 'helpful' : 'not_helpful',
+                context: conversationHistory.slice(0, messageIndex),
+                timestamp: new Date().toISOString()
+            };
+            const csrfToken = getCookie('csrftoken');
+            fetch('/save-feedback/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken || '',
+                },
+                body: JSON.stringify(feedbackData)
+            })
+            .finally(() => {
+                showFeedbackMessage(isHelpful);
+                if (!isHelpful) {
+                    showTypingIndicator();
+                    setTimeout(() => {
+                        removeTypingIndicator();
+                        const lastUserMessage = conversationHistory[messageIndex - 1].message;
+                        generateAlternativeResponse(lastUserMessage, messageId);
+                    }, 1500);
+                }
+            });
+        };
+        function showFeedbackMessage(isHelpful) {
+            const feedbackMsg = document.createElement('div');
+            feedbackMsg.classList.add('chatbot-message', 'bot-message');
+            feedbackMsg.innerHTML = `
+                <small><i>${isHelpful ? 
+                    'Thanks for your feedback!' :
+                    'We\'ll try to do better next time.'}</i></small>
+            `;
+            chatBody.appendChild(feedbackMsg);
+            scrollToBottom();
+        }
+
+        function generateAlternativeResponse(userMessage, originalMessageId) {
+            fetch(`/get-alternative-response/?message=${encodeURIComponent(userMessage)}&original_message_id=${originalMessageId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Alternative response failed');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.response) {
+                        const newMessageId = 'msg-' + Date.now();
+                        addBotMessage(data.response, newMessageId);
+                        conversationHistory.push({
+                            sender: 'bot',
+                            message: data.response,
+                            messageId: newMessageId,
+                            is_alternative: true,
+                            original_message_id: originalMessageId,
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error getting alternative response:", error);
+                    addBotMessage("Let me try to help differently. Could you please rephrase your question?", 'msg-' + Date.now());
+                });
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.classList.add('chatbot-message', 'bot-message');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div>Typing <span class="typing-indicator">
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                </span></div>
+            `;
+            chatBody.appendChild(typingDiv);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) indicator.remove();
+        }
+
+        // Scroll to bottom of chat
+        function scrollToBottom() {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // Get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>

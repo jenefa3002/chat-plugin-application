@@ -1,0 +1,157 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Login</title>
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('/static/img/bg.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-container h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background-color: #4e73df;
+            border: none;
+            font-size: 1rem;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .btn-primary:hover {
+            background-color: #3759c7;
+        }
+
+        .text-center a {
+            font-size: 0.9rem;
+            color: #4e73df;
+        }
+
+        .text-center a:hover {
+            text-decoration: underline;
+        }
+
+        .captcha-container {
+        display: flex;
+        align-items: center;
+        margin: 15px 0;
+        gap: 10px;  /* Space between elements */
+    }
+
+    .captcha-image {
+        width: 100%;  /* Make image responsive */
+        height: auto;  /* Maintain aspect ratio */
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .captcha-refresh {
+        cursor: pointer;
+        color: #4e73df;
+        font-size: 1.2rem;
+    }
+
+    .captcha-input {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1 class="mb-3">Welcome Back!</h1>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <form class="user" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+    </div>
+    <div class="form-group">
+        {{ form.password.label_tag }}
+        {{ form.password }}
+    </div>
+
+    <!-- CAPTCHA Section -->
+    <div class="form-group">
+        {{ form.captcha.label_tag }}
+        <div class="captcha-container">
+            {{ form.captcha }}
+            <i class="fas fa-sync-alt captcha-refresh" id="refresh-captcha"></i>
+        </div>
+    </div>
+
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary mt-3">Login</button>
+</form>
+        <hr>
+        <div class="text-center">
+            <a class="small" href="{% url 'password_reset' %}">Forgot Password?</a>
+        </div>
+        <div class="text-center">
+            <a class="small" href="{% url 'signup' %}">Create an Account!</a>
+        </div>
+    </div>
+{% include 'chatbot.html' %}
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+    <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+
+    <script>
+        $('#refresh-captcha').click(function(){
+            $.getJSON("/refresh-captcha/", function(result){
+                $('.captcha').attr('src', result.image_url);
+                $('#id_captcha_0').val(result.key);
+            });
+        });
+    </script>
+</body>
+</html>

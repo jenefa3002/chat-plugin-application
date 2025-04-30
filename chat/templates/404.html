@@ -1,0 +1,195 @@
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Raleway:wght@300;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Floating Background Bubbles */
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh);
+                opacity: 0;
+            }
+        }
+
+        /* Error Message Box */
+        .error-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+            z-index: 1;
+            position: relative;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Floating Chatbot */
+        .chatbot-img {
+            width: 120px;
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        /* Glowing Text */
+        h1 {
+            font-size: 2.8rem;
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            animation: glow 1.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 1);
+            }
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #eee;
+            margin-bottom: 20px;
+        }
+
+        /* Attractive Button */
+        .btn-home {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            border-radius: 50px;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 15px rgba(255, 75, 50, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 10px rgba(255, 75, 50, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255, 75, 50, 0.9);
+            }
+            100% {
+                box-shadow: 0 0 10px rgba(255, 75, 50, 0.5);
+            }
+        }
+
+        .btn-home:hover {
+            background: linear-gradient(45deg, #ff4b2b, #ff416c);
+            transform: translateY(-3px);
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="bubbles"></div>
+
+    <div class="error-container">
+        <img src="https://img.icons8.com/?size=100&id=WmNnZ0PVkFsY&format=png&color=000000" alt="Chatbot" class="chatbot-img">
+        <h1>Oops! Page Not Found</h1>
+        <p>Requested page is not found, Maybe because of Section logot.  Go back to Login page</p>
+        <a href="{% url 'login' %}" class="btn-home">Back</a>
+    </div>
+
+    <script>
+        function createBubbles() {
+            const bubbleContainer = document.querySelector('.bubbles');
+            for (let i = 0; i < 25; i++) {
+                let bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                let size = Math.random() * 60 + 10;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                bubble.style.left = Math.random() * 100 + 'vw';
+                bubble.style.animationDuration = Math.random() * 5 + 3 + 's';
+                bubbleContainer.appendChild(bubble);
+            }
+        }
+        createBubbles();
+    </script>
+
+</body>
+
+</html>
