@@ -297,3 +297,42 @@ class OnlineStatusConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_online_users(self):
         return list(UserStatus.objects.filter(is_online=True).values("user__id", "user__username"))
+
+class VideoCallConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.sender = self.scope['url_route']['kwargs']['sender']
+        self.recipient = self.scope['url_route']['kwargs']['recipient']
+        self.room_name = f"videocall_{min(self.sender, self.recipient)}_{max(self.sender, self.recipient)}"
+        self.room_group_name = f"videocall_{self.room_name}"
+
+        # Join room group
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        # Leave room group
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        data['sender'] = self.sender
+
+        # Send message to room group
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'videocall_message',
+                'data': data
+            }
+        )
+
+    async def videocall_message(self, event):
+        data = event['data']
+        await self.send(text_data=json.dumps(data))

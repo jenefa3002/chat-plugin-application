@@ -9,7 +9,7 @@ websocket_urlpatterns = [
     re_path(r'ws/screenshare/(?P<sender_username>\w+)/(?P<recipient_username>\w+)/$', consumers.ScreenShareConsumer.as_asgi()),
     re_path(r"ws/online/$", OnlineStatusConsumer.as_asgi()),
     re_path(r"ws/notifications/$", NotificationConsumer.as_asgi()),
-
+    re_path(r'ws/videocall/(?P<sender>\w+)/(?P<recipient>\w+)/$', consumers.VideoCallConsumer.as_asgi()),
 ]
 application = ProtocolTypeRouter(
     {

@@ -33,7 +33,233 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
     <style>
-            .typing-indicator-container {
+      .call-waiting-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+      }
+
+      .call-waiting-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 12px;
+        font-family: "Times New Roman", Times, serif;
+      }
+
+      .call-waiting-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .call-waiting-buttons button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .call-waiting-buttons .cancel-call {
+        background: #f44336;
+        color: white;
+        border-radius: 50px;
+      }
+
+      .call-waiting-buttons .cancel-call img {
+        height: 15px;
+        weight: 15px;
+      }
+
+      .call-waiting-text {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .call-waiting-spinner {
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(0,0,0,0.1);
+        border-radius: 50%;
+        border-top-color: #4e73df;
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      .call-confirmation-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+      }
+
+      .call-confirmation-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 12px;
+        font-family: "Times New Roman", Times, serif;
+      }
+
+      .call-confirmation-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .call-confirmation-buttons button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .call-confirmation-buttons .accept-call {
+        background: #4CAF50;
+        color: white;
+        border-radius: 50px;
+      }
+      .call-confirmation-buttons .accept-call img{
+        height: 15px;
+        weight: 15px;
+      }
+      .call-confirmation-buttons .reject-call {
+        background: #f44336;
+        color: white;
+        border-radius: 50px;
+      }
+      .call-confirmation-buttons .reject-call img{
+        height: 15px;
+        weight: 15px;
+      }
+      .call-notification {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        z-index: 100;
+        font-size: 14px;
+        animation: fadeIn 0.3s ease;
+        max-width: 80%;
+        text-align: center;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+      }
+      .video-call-container {
+        display: none;
+        position: flex;
+        flex-direction: column;
+        gap: 10px;
+        border: 5px;
+        margin-top: 5px;
+        padding: 10px;
+        background: #f8f9fc;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        height: 25%;
+      }
+
+      .video-call-container video {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+      }
+
+      .call-controls {
+        position: absolute;
+        bottom: auto;
+        left: 50%;
+        align-items: center;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 15px;
+        z-index: 1000;
+      }
+
+      .call-controls button {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .call-controls button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+
+      .call-controls button img {
+        width: 15px;
+        height: 15px;
+      }
+
+      .call-controls .end-call-btn {
+        background: #ff5b5b;
+      }
+
+      .call-controls .end-call-btn:hover {
+        background: #ff3a3a;
+      }
+
+      .video-call-btn {
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, #6cb2eb, #4e73df);
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .video-call-btn:hover {
+        background: linear-gradient(135deg, #4e73df, #6cb2eb);
+      }
+
+      .video-call-btn img {
+        width: 20px;
+        height: 20px;
+      }
+      .typing-indicator-container {
           height: 20px;
           margin: 5px 0;
           padding: 0 15px;
@@ -1109,6 +1335,920 @@
     </div>
     {% include 'chatbot.html' %}
     <script>
+      class VideoCall {
+        constructor() {
+          this.peerConnections = {};
+          this.callTimeouts = {};
+          this.localStreams = {};
+          this.remoteStreams = {};
+          this.makingOffer = {};
+          this.ignoreOffer = {};
+          this.polite = {};
+          this.peerData = {};
+          this.callSockets = {};
+          this.messageQueue = {};
+          this.lastProcessedMessages = {};
+          this.activeCallRequests = {};
+          this.lastMessages = {};
+          this.callStates = {};
+          this.callCooldowns = {};
+          this.activeCalls = {};
+          this.processedSignalingMessages = {};
+          this.rtcConfig = {
+            iceServers: [
+              {
+                urls: "turn:relay1.expressturn.com:3478",
+                username: "ef0OSL1KJJM05XK829",
+                credential: "4HQgeo0mAcWomtgj",
+              },
+              {
+                urls: [
+                  "stun:stun.l.google.com:19302",
+                  "stun:stun1.l.google.com:19302",
+                  "stun:stun2.l.google.com:19302",
+                ],
+              },
+            ],
+            iceTransportPolicy: "all",
+            bundlePolicy: "max-bundle",
+            rtcpMuxPolicy: "require",
+            iceCandidatePoolSize: 10,
+          };
+        }
+
+        async initVideoCall(chatPanelId, sender, recipient) {
+          try {
+            console.log(`Initializing video call for ${chatPanelId}`);
+            this.cleanupVideoCall(chatPanelId);
+            this.peerData[chatPanelId] = { sender, recipient };
+            this.polite[chatPanelId] = true;
+            this.makingOffer[chatPanelId] = false;
+            this.ignoreOffer[chatPanelId] = false;
+
+            this.callSockets[chatPanelId] = new WebSocket(
+              window.location.protocol === "https:"
+                ? `wss://${window.location.host}/ws/videocall/${sender}/${recipient}/`
+                : `ws://${window.location.host}/ws/videocall/${sender}/${recipient}/`
+            );
+
+            this.callSockets[chatPanelId].onopen = async () => {
+              if (!this.peerConnections[chatPanelId]) {
+                await this.createPeerConnection(chatPanelId);
+              }
+            };
+
+            this.setupCallSocketHandlers(chatPanelId);
+            this.createVideoElements(chatPanelId);
+            this.setupCallEventListeners(chatPanelId);
+
+            console.log(`Video call initialized for ${chatPanelId}`);
+          } catch (error) {
+            console.error(`Error initializing video call: ${error}`);
+            this.showError(chatPanelId, "Failed to initialize video call");
+          }
+        }
+
+        setupCallSocketHandlers(chatPanelId) {
+          const socket = this.callSockets[chatPanelId];
+          this.lastMessages = this.lastMessages || {};
+          socket.onopen = async () => {
+            console.log(`Video call WebSocket opened for ${chatPanelId}`);
+            this.updateCallStatus(chatPanelId, "connecting");
+            await this.createPeerConnection(chatPanelId);
+            this.processMessageQueue(chatPanelId);
+          };
+
+          socket.onerror = (error) => {
+            console.error(`WebSocket error for ${chatPanelId}:`, error);
+            this.updateCallStatus(chatPanelId, "disconnected");
+          };
+
+          socket.onclose = () => {
+            console.log(`WebSocket closed for ${chatPanelId}`);
+            this.updateCallStatus(chatPanelId, "disconnected");
+            this.cleanupSocket(chatPanelId);
+          };
+
+          socket.onmessage = async (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              console.log(`Received ${data.type} for ${chatPanelId}`, data);
+              if (!this.isValidCallMessageType(data.type)) {
+                console.warn(`Invalid message type: ${data.type}`);
+                return;
+              }
+
+              if (!this.isPeerConnectionReady(chatPanelId)) {
+                console.log(`PeerConnection not ready, queuing ${data.type}`);
+                this.queueMessage(chatPanelId, data);
+                return;
+              }
+
+              await this.processCallSignalingMessage(chatPanelId, data);
+            } catch (error) {
+              console.error(`Error handling message for ${chatPanelId}:`, error);
+            }
+          };
+        }
+
+         async processMessageQueue(chatPanelId) {
+          if (!this.messageQueue[chatPanelId] || this.messageQueue[chatPanelId].length === 0) {
+            return;
+          }
+
+          console.log(`Processing ${this.messageQueue[chatPanelId].length} queued messages for ${chatPanelId}`);
+
+          while (this.messageQueue[chatPanelId].length > 0 && this.isPeerConnectionReady(chatPanelId)) {
+            const message = this.messageQueue[chatPanelId].shift();
+            try {
+              await this.processCallSignalingMessage(chatPanelId, message);
+            } catch (error) {
+              console.error(`Error processing queued ${message.type}:`, error);
+            }
+          }
+        }
+
+        queueMessage(chatPanelId, message) {
+          if (!this.messageQueue[chatPanelId]) {
+            this.messageQueue[chatPanelId] = [];
+          }
+          this.messageQueue[chatPanelId].push(message);
+          console.log(`Message queued for ${chatPanelId}:`, message.type);
+        }
+
+        createVideoElements(chatPanelId) {
+          const container = document.getElementById(`video-call-container-${chatPanelId}`);
+          if (!container) {
+            console.error(`Container not found for ${chatPanelId}`);
+            return;
+          }
+          if (!document.getElementById(`localVideoCall-${chatPanelId}`)) {
+            const localVideo = document.createElement("video");
+            localVideo.id = `localVideoCall-${chatPanelId}`;
+            localVideo.className = "localVideo";
+            localVideo.autoplay = true;
+            localVideo.muted = true;
+            localVideo.playsInline = true;
+            container.insertBefore(localVideo, container.firstChild);
+          }
+          if (!document.getElementById(`remoteVideoCall-${chatPanelId}`)) {
+            const remoteVideo = document.createElement("video");
+            remoteVideo.id = `remoteVideoCall-${chatPanelId}`;
+            remoteVideo.className = "remoteVideo";
+            remoteVideo.autoplay = true;
+            remoteVideo.playsInline = true;
+            container.insertBefore(remoteVideo, container.firstChild);
+          }
+          if (!container.querySelector('.call-controls')) {
+            const callControls = document.createElement("div");
+            callControls.className = "call-controls";
+            callControls.innerHTML = `
+              <button class="end-call-btn" id="end-call-btn-${chatPanelId}">
+                <img alt="end call" src="https://img.icons8.com/?size=100&id=20578&format=png&color=000000">
+              </button>
+              <button class="mute-btn" id="mute-btn-${chatPanelId}">
+                <img alt="Mute" src="https://img.icons8.com/?size=100&id=JtlARuXJXaPI&format=png&color=000000">
+              </button>
+              <button class="video-off-btn" id="video-off-btn-${chatPanelId}">
+                <img src="https://img.icons8.com/?size=100&id=GQ1GoxtCGHG4&format=png&color=000000" alt="Video off">
+              </button>
+            `;
+            container.appendChild(callControls);
+          }
+          if (!document.getElementById(`call-status-${chatPanelId}`)) {
+            const statusIndicator = document.createElement("div");
+            statusIndicator.id = `call-status-${chatPanelId}`;
+            statusIndicator.className = "connection-status";
+            container.appendChild(statusIndicator);
+          }
+        }
+        setupCallEventListeners(chatPanelId) {
+          const { sender, recipient } = this.peerData[chatPanelId] || {};
+          if (!sender || !recipient) return;
+          $(`#video-call-btn-${chatPanelId}`).off('click').on('click', async () => {
+            if (this.localStreams[chatPanelId]) {
+              await this.endCall(chatPanelId);
+            } else {
+              await this.startCall(chatPanelId, sender, recipient);
+            }
+          });
+          $(`#end-call-btn-${chatPanelId}`).off('click').on('click', async () => {
+            await this.endCall(chatPanelId);
+          });
+          $(`#mute-btn-${chatPanelId}`).off('click').on('click', () => {
+            this.toggleMute(chatPanelId);
+          });
+          $(`#video-off-btn-${chatPanelId}`).off('click').on('click', () => {
+            this.toggleVideo(chatPanelId);
+          });
+          $(document).on(`click`, `.close-chat-content[data-id="${chatPanelId}"]`, () => {
+            this.cleanupVideoCall(chatPanelId);
+          });
+        }
+
+        async startCall(chatPanelId, sender, recipient) {
+          if (this.activeCalls[recipient]) {
+            console.log(`Call to ${recipient} already exists - merging`);
+            return;
+          }
+          this.activeCalls[recipient] = chatPanelId;
+          if (this.callStates[chatPanelId] && this.callStates[chatPanelId] !== 'idle') {
+            console.log(`Call already in progress for ${chatPanelId}`);
+            return;
+          }
+          if (this.callCooldowns[chatPanelId] &&
+              Date.now() - this.callCooldowns[chatPanelId] < 2000) {
+            console.log("Call cooldown active - skipping");
+            return;
+          }
+          this.callCooldowns[chatPanelId] = Date.now();
+          this.callStates[chatPanelId] = 'initiating';
+          try {
+            console.log(`Starting call for ${chatPanelId}`);
+            if (this.callSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
+              const waitingUI = $(`
+                <div id="call-waiting-${chatPanelId}" class="call-waiting-modal">
+                  <div class="call-waiting-content">
+                    <div class="call-waiting-text">
+                      <div class="call-waiting-spinner"></div>
+                      <span>Calling ${recipient}...</span>
+                    </div>
+                    <div class="call-waiting-buttons">
+                      <button class="cancel-call">
+                        <img src="https://img.icons8.com/?size=100&id=20578&format=png&color=000000" alt="Cancel">
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              `);
+
+              $('.chat-container').append(waitingUI);
+              waitingUI.find('.cancel-call').click(() => {
+                this.endCall(chatPanelId);
+                waitingUI.remove();
+              });
+            }
+            $(`#video-call-container-${chatPanelId}`).show();
+            this.updateCallStatus(chatPanelId, "connecting");
+            if (!(await this.createPeerConnection(chatPanelId))) {
+              throw new Error("Failed to create peer connection");
+            }
+            try {
+              this.localStreams[chatPanelId] = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
+              }).catch(async (videoError) => {
+                console.log("Video not available, trying audio only");
+                return await navigator.mediaDevices.getUserMedia({ audio: true });
+              });
+              const localVideo = document.getElementById(`localVideoCall-${chatPanelId}`);
+              if (localVideo) {
+                if (this.localStreams[chatPanelId].getVideoTracks().length > 0) {
+                  localVideo.srcObject = this.localStreams[chatPanelId];
+                  localVideo.classList.add("active");
+                  localVideo.play().catch(e => console.log("Local video play error:", e));
+                } else {
+                  localVideo.style.display = "none";
+                  this.showNotification(chatPanelId, "Starting audio-only call (no video available)");
+                }
+              }
+              this.localStreams[chatPanelId].getTracks().forEach(track => {
+                this.peerConnections[chatPanelId].addTrack(track, this.localStreams[chatPanelId]);
+              });
+              if (this.callSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
+                this.callSockets[chatPanelId].send(JSON.stringify({
+                  type: "call_initiate",
+                  sender: sender,
+                  recipient: recipient,
+                  hasVideo: this.localStreams[chatPanelId].getVideoTracks().length > 0,
+                  hasAudio: this.localStreams[chatPanelId].getAudioTracks().length > 0
+                }));
+              }
+              this.callTimeouts[chatPanelId] = setTimeout(() => {
+                if (this.callStates[chatPanelId] === 'initiating') {
+                  this.showNotification(chatPanelId, "Call not answered");
+                  this.endCall(chatPanelId);
+                  waitingUI.remove();
+                }
+              }, 20000);
+            } catch (error) {
+              console.error(`Error getting media devices: ${error}`);
+              waitingUI.remove();
+              this.endCall(chatPanelId);
+              if (error.name !== "NotAllowedError") {
+                this.showError(chatPanelId, `Could not start call: ${error.message}`);
+              }
+              this.callStates[chatPanelId] = 'idle';
+              throw error;
+            }
+            this.callStates[chatPanelId] = 'active';
+          } catch (error) {
+            console.error(`Error starting call: ${error}`);
+            this.endCall(chatPanelId);
+            if (error.name !== "NotAllowedError") {
+              this.showError(chatPanelId, `Could not start call: ${error.message}`);
+            }
+            this.callStates[chatPanelId] = 'idle';
+            throw error;
+          }
+        }
+        setAudioOnlyUI(chatPanelId, isAudioOnly) {
+          const container = document.getElementById(`video-call-container-${chatPanelId}`);
+          if (!container) return;
+          const existingIndicator = container.querySelector('.audio-only-indicator');
+          if (existingIndicator) existingIndicator.remove();
+          const localVideo = document.getElementById(`localVideoCall-${chatPanelId}`);
+          if (localVideo) {
+            localVideo.style.display = isAudioOnly ? "none" : "block";
+          }
+          if (isAudioOnly) {
+            //use a image to indicate if needed
+          }
+        }
+        showNotification(chatPanelId, message, duration = 3000) {
+          $(`#notification-${chatPanelId}`).remove();
+          const notification = $(`
+            <div id="notification-${chatPanelId}" class="call-notification">
+              ${message}
+            </div>
+          `);
+          $(`#video-call-container-${chatPanelId}`).append(notification);
+          setTimeout(() => {
+            notification.fadeOut(500, () => notification.remove());
+          }, duration);
+        }
+        async createPeerConnection(chatPanelId) {
+          if (this.peerConnections[chatPanelId]) {
+            if (['closed', 'failed'].includes(this.peerConnections[chatPanelId].connectionState)) {
+              this.peerConnections[chatPanelId].close();
+              delete this.peerConnections[chatPanelId];
+            } else {
+              return true;
+            }
+          }
+
+          try {
+            console.log(`Creating PeerConnection for video call ${chatPanelId}`);
+            this.peerConnections[chatPanelId] = new RTCPeerConnection(this.rtcConfig);
+            this.updateCallStatus(chatPanelId, "connecting");
+            this.setupPeerConnectionHandlers(chatPanelId);
+            console.log(`PeerConnection created for ${chatPanelId}`);
+            return true;
+          } catch (error) {
+            console.error(`Error creating PeerConnection: ${error}`);
+            this.updateCallStatus(chatPanelId, "disconnected");
+            return false;
+          }
+        }
+
+        setupPeerConnectionHandlers(chatPanelId) {
+          const pc = this.peerConnections[chatPanelId];
+          if (!pc) return;
+
+          pc.onicecandidate = ({ candidate }) => {
+            console.log(`ICE candidate for ${chatPanelId}:`, candidate);
+            if (candidate && this.callSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
+              this.callSockets[chatPanelId].send(JSON.stringify({
+                type: "candidate",
+                candidate: candidate,
+              }));
+            }
+          };
+
+          pc.onnegotiationneeded = async () => {
+            try {
+              console.log(`Negotiation needed for ${chatPanelId}`);
+              this.makingOffer[chatPanelId] = true;
+              await pc.setLocalDescription();
+              console.log(`Local description set:`, pc.localDescription);
+
+              if (this.callSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
+                this.callSockets[chatPanelId].send(JSON.stringify({
+                  type: "offer",
+                  offer: pc.localDescription,
+                }));
+                console.log(`Offer sent for ${chatPanelId}`);
+              }
+            } catch (err) {
+              console.error(`Negotiation error for ${chatPanelId}:`, err);
+            } finally {
+              this.makingOffer[chatPanelId] = false;
+            }
+          };
+
+          pc.oniceconnectionstatechange = () => {
+            const state = pc.iceConnectionState;
+            console.log(`ICE connection state changed to ${state} for ${chatPanelId}`);
+            this.updateCallStatus(chatPanelId, state);
+            if (pc.iceConnectionState === "failed") {
+              console.log("ICE failed - restarting in 1s");
+              setTimeout(() => {
+                if (pc.iceConnectionState !== "closed") {
+                  pc.restartIce();
+                }
+              }, 1000);
+            }
+          };
+
+          pc.ontrack = (event) => {
+            console.log("Track event received:", event);
+            const remoteVideo = document.getElementById(`remoteVideoCall-${chatPanelId}`);
+            if (!remoteVideo) {
+              console.error("Remote video element not found");
+              return;
+            }
+
+            if (!this.remoteStreams[chatPanelId] && event.streams && event.streams.length > 0) {
+              this.remoteStreams[chatPanelId] = event.streams[0];
+              remoteVideo.srcObject = this.remoteStreams[chatPanelId];
+
+              remoteVideo.onplay = () => {
+                const playBtn = document.querySelector(`#video-call-container-${chatPanelId} .video-play-button`);
+                if (playBtn) playBtn.remove();
+              };
+
+              const playPromise = remoteVideo.play();
+              if (playPromise !== undefined) {
+                playPromise.catch((error) => {
+                  console.log("Autoplay prevented, showing play button");
+                  this.showPlayButton(chatPanelId, remoteVideo);
+                });
+              }
+            }
+          };
+
+          pc.onconnectionstatechange = () => {
+            const state = pc.connectionState;
+            console.log(`Connection state changed to ${state} for ${chatPanelId}`);
+            if (state === "failed") {
+              console.log("ICE failed - restarting ICE");
+              pc.restartIce();
+              setTimeout(() => {
+                if (!this.peerConnections[chatPanelId]) {
+                  this.initVideoCall(chatPanelId, this.peerData[chatPanelId].sender,
+                                   this.peerData[chatPanelId].recipient);
+                }
+              }, 2000);
+            }
+            switch (state) {
+              case "connected":
+                this.handleConnectionSuccess(chatPanelId);
+                break;
+              case "failed":
+                if (!this.isClosingCall[chatPanelId]) {
+                  this.showNotification(chatPanelId, "Call disconnected");
+                  this.endCall(chatPanelId);
+                }
+                setTimeout(() => {
+                  const { sender, recipient } = this.peerData[chatPanelId] || {};
+                  if (sender && recipient && !this.peerConnections[chatPanelId]) {
+                    this.initVideoCall(chatPanelId, sender, recipient);
+                  }
+                }, 2000);
+                break;
+              case "disconnected":
+                this.endCall(chatPanelId);
+                break;
+            }
+          };
+        }
+
+        async processCallSignalingMessage(chatPanelId, data) {
+          const messageId = `${data.type}-${JSON.stringify(data.offer || data.answer || data.candidate)}`;
+          if (this.processedSignalingMessages[chatPanelId]?.has(messageId)) {
+            console.log(`Ignoring duplicate ${data.type} message`);
+            return;
+          }
+          if (!this.processedSignalingMessages[chatPanelId]) {
+            this.processedSignalingMessages[chatPanelId] = new Set();
+          }
+          this.processedSignalingMessages[chatPanelId].add(messageId);
+          if (!this.peerConnections[chatPanelId]) {
+            console.log(`PeerConnection not ready, queuing ${data.type}`);
+            this.queueMessage(chatPanelId, data);
+            return;
+          }
+
+          const pc = this.peerConnections[chatPanelId];
+          const currentDescription = pc.remoteDescription || pc.localDescription;
+          if (this.lastProcessedMessages[chatPanelId] === data.type + data.sender) {
+            return;
+          }
+          this.lastProcessedMessages[chatPanelId] = data.type + data.sender;
+          if (currentDescription && data.type === currentDescription.type) {
+            console.log(`Ignoring duplicate ${data.type}`);
+            return;
+          }
+
+          switch (data.type) {
+            case "call_initiate":
+              await this.handleCallInitiation(chatPanelId, data);
+              break;
+            case "offer":
+              await this.handleOffer(chatPanelId, data.offer);
+              break;
+            case "answer":
+              await this.handleAnswer(chatPanelId, data.answer);
+              break;
+            case "candidate":
+              await this.handleCandidate(chatPanelId, data.candidate);
+              break;
+            case "end_call":
+              await this.endCall(chatPanelId);
+              break;
+            case "call_rejected":
+              await this.handleCallRejection(chatPanelId, data);
+              break;
+          }
+        }
+
+        async handleCallRejection(chatPanelId, data) {
+          console.log(`Call rejected by ${data.sender}`);
+          this.showNotification(chatPanelId, `${data.sender} rejected the call`);
+          await this.endCall(chatPanelId);
+        }
+
+        handleConnectionSuccess(chatPanelId) {
+            console.log(`Connection established for ${chatPanelId}`);
+            const statusElement = document.getElementById(`call-status-${chatPanelId}`);
+            if (statusElement) {
+              statusElement.className = "connection-status connected";
+            }
+            this.monitorConnectionQuality(chatPanelId);
+          }
+
+          monitorConnectionQuality(chatPanelId) {
+            const pc = this.peerConnections[chatPanelId];
+            if (!pc) return;
+
+            setInterval(() => {
+              pc.getStats().then(stats => {
+                stats.forEach(report => {
+                  if (report.type === 'candidate-pair' && report.nominated) {
+                    console.log(`Connection quality for ${chatPanelId}:`, {
+                      rtt: report.currentRoundTripTime,
+                      availableOutgoingBitrate: report.availableOutgoingBitrate
+                    });
+                  }
+                });
+              });
+            }, 1000);
+          }
+        async handleCallInitiation(chatPanelId, data) {
+          if (this.activeCallRequests[chatPanelId]) {
+            console.log(`Already handling call request for ${chatPanelId}`);
+            return;
+          }
+           if (data.recipient !== "{{ request.user.username }}") {
+            return;
+          }
+          this.activeCallRequests[chatPanelId] = data.sender;
+          if (document.getElementById(`call-confirmation-${chatPanelId}`)) {
+            return;
+          }
+          const confirmation = $(`
+            <div id="call-confirmation-${chatPanelId}" class="call-confirmation-modal">
+              <div class="call-confirmation-content">
+                <p>Incoming.....</p>
+                <div class="call-confirmation-buttons">
+                  <button class="accept-call"><img src="https://img.icons8.com/?size=100&id=9660&format=png&color=000000" alt="Accept"></button>
+                  <button class="reject-call"><img src="https://img.icons8.com/?size=100&id=20578&format=png&color=000000" alt = "Decline"></button>
+                </div>
+              </div>
+            </div>
+          `);
+
+          $('.chat-content-panel').append(confirmation);
+
+          return new Promise((resolve) => {
+            confirmation.find('.accept-call').click(async () => {
+              confirmation.remove();
+              try {
+                await this.startCall(chatPanelId, data.recipient, data.sender);
+                resolve(true);
+              } catch (error) {
+                resolve(false);
+              }
+            });
+
+            confirmation.find('.reject-call').click(() => {
+              confirmation.remove();
+              if (this.callSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
+                this.callSockets[chatPanelId].send(JSON.stringify({
+                  type: "call_rejected",
+                  sender: data.recipient,
+                  recipient: data.sender
+                }));
+              }
+              resolve(false);
+            });
+          });
+        }
+
+        async handleOffer(chatPanelId, offer) {
+          try {
+            const pc = this.peerConnections[chatPanelId];
+            if (!pc) return;
+            const isSimilarOffer = pc.remoteDescription &&
+              pc.remoteDescription.sdp.split('\r\n').slice(0,3).join() ===
+              offer.sdp.split('\r\n').slice(0,3).join();
+
+            if (isSimilarOffer) {
+              console.log("Similar offer - responding with existing answer");
+              if (pc.localDescription) {
+                this.callSockets[chatPanelId].send(JSON.stringify({
+                  type: "answer",
+                  answer: pc.localDescription
+                }));
+              }
+              return;
+            }
+
+            if (pc.remoteDescription && pc.remoteDescription.sdp.split('\r\n')[1] === offer.sdp.split('\r\n')[1]) {
+              console.log("Similar offer - ignoring");
+              return;
+            }
+            const offerCollision = this.makingOffer[chatPanelId] ||
+                                 (pc.signalingState !== "stable" && pc.signalingState !== "have-local-offer");
+
+            this.ignoreOffer[chatPanelId] = !this.polite[chatPanelId] && offerCollision;
+            if (this.ignoreOffer[chatPanelId]) {
+              console.log(`Ignoring offer for ${chatPanelId} due to collision`);
+              return;
+            }
+
+            await pc.setRemoteDescription(new RTCSessionDescription(offer));
+
+            if (offer.type === "offer") {
+              await pc.setLocalDescription();
+              this.callSockets[chatPanelId].send(JSON.stringify({
+                type: "answer",
+                answer: pc.localDescription,
+              }));
+            }
+          } catch (error) {
+            console.error(`Error handling offer: ${error}`);
+            this.endCall(chatPanelId);
+          }
+        }
+
+        async handleAnswer(chatPanelId, answer) {
+          try {
+            console.log("Processing answer", answer);
+            const pc = this.peerConnections[chatPanelId];
+
+            if (!pc || pc.signalingState === "closed") {
+              console.warn("PeerConnection not ready for answer");
+              return;
+            }
+            $(`#call-waiting-${chatPanelId}`).remove();
+            if (pc.remoteDescription && pc.remoteDescription.type === 'answer' &&
+                pc.remoteDescription.sdp === answer.sdp) {
+              console.log("Ignoring duplicate answer");
+              return;
+            }
+            if (pc.signalingState === "have-local-offer" || pc.signalingState === "stable") {
+              if (!pc.remoteDescription) {
+                await pc.setRemoteDescription(new RTCSessionDescription(answer));
+                console.log("Answer processed successfully");
+              } else {
+                console.log("Ignoring duplicate answer");
+              }
+            } else {
+              console.warn(`Unexpected signaling state for answer: ${pc.signalingState}`);
+              this.queueMessage(chatPanelId, { type: "answer", answer });
+            }
+          } catch (error) {
+            console.error("Error handling answer:", error);
+            throw error;
+          }
+        }
+
+        async handleCandidate(chatPanelId, candidate) {
+          try {
+            const pc = this.peerConnections[chatPanelId];
+            if (!pc || pc.signalingState === "closed") return;
+            if (!candidate || this.ignoreOffer[chatPanelId]) return;
+            if (!pc.remoteDescription) {
+              await new Promise(resolve => {
+                const checkDesc = () => {
+                  if (pc.remoteDescription) {
+                    resolve();
+                  } else {
+                    setTimeout(checkDesc, 100);
+                  }
+                };
+                checkDesc();
+              });
+            }
+            if (candidate.candidate.includes("typ host") &&
+                pc.remoteDescription &&
+                pc.remoteDescription.type === "answer") {
+              console.log("Skipping host candidate after answer");
+              return;
+            }
+
+            await pc.addIceCandidate(new RTCIceCandidate(candidate));
+          } catch (err) {
+            if (!this.ignoreOffer[chatPanelId]) {
+              console.error("Failed to add ICE candidate:", err);
+            }
+          }
+        }
+
+        toggleMute(chatPanelId) {
+          if (this.localStreams[chatPanelId]) {
+            const audioTracks = this.localStreams[chatPanelId].getAudioTracks();
+            if (audioTracks.length > 0) {
+              const isMuted = !audioTracks[0].enabled;
+              audioTracks[0].enabled = isMuted;
+
+              const muteBtn = document.getElementById(`mute-btn-${chatPanelId}`);
+              if (muteBtn) {
+                muteBtn.innerHTML = isMuted
+                  ? '<img alt="Mute" src="https://img.icons8.com/?size=100&id=644&format=png&color=000000">'
+                  : '<img alt="Unmute" src="https://img.icons8.com/?size=100&id=41562&format=png&color=000000">';
+              }
+              if (this.callSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
+                this.callSockets[chatPanelId].send(JSON.stringify({
+                  type: "mute_status",
+                  isMuted: !isMuted
+                }));
+              }
+            }
+          }
+        }
+
+        toggleVideo(chatPanelId) {
+          if (this.localStreams[chatPanelId]) {
+            const videoTracks = this.localStreams[chatPanelId].getVideoTracks();
+            if (videoTracks.length > 0) {
+              const isVideoOff = !videoTracks[0].enabled;
+              videoTracks[0].enabled = isVideoOff;
+
+              const videoBtn = document.getElementById(`video-off-btn-${chatPanelId}`);
+              if (videoBtn) {
+                videoBtn.innerHTML = isVideoOff
+                  ? '<img src="https://img.icons8.com/?size=100&id=GQ1GoxtCGHG4&format=png&color=000000" alt="Video off">'
+                  : '<img src="https://img.icons8.com/?size=100&id=11374&format=png&color=000000" alt="Video on">';
+              }
+              if (this.callSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
+                this.callSockets[chatPanelId].send(JSON.stringify({
+                  type: "video_status",
+                  isVideoOff: !isVideoOff
+                }));
+              }
+            }
+          }
+        }
+
+        async endCall(chatPanelId) {
+          if (this.callStates[chatPanelId] === 'ending' || this.callStates[chatPanelId] === 'idle') {
+            return;
+          }
+          $(`#call-waiting-${chatPanelId}`).remove();
+          if (this.callTimeouts[chatPanelId]) {
+            clearTimeout(this.callTimeouts[chatPanelId]);
+          }
+          this.callTimeouts[chatPanelId] = setTimeout(() => {
+            if (this.peerConnections[chatPanelId]) {
+              this.peerConnections[chatPanelId].close();
+              delete this.peerConnections[chatPanelId];
+            }
+            delete this.activeCalls[this.peerData[chatPanelId]?.recipient];
+          }, 1000);
+          this.callStates[chatPanelId] = 'ending';
+            try {
+              console.log(`Ending call for ${chatPanelId}`);
+              if (this.callSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
+                this.callSockets[chatPanelId].send(JSON.stringify({
+                  type: "end_call"
+                }));
+              }
+              if (this.localStreams[chatPanelId]) {
+                this.localStreams[chatPanelId].getTracks().forEach(track => track.stop());
+                delete this.localStreams[chatPanelId];
+              }
+
+              if (this.remoteStreams[chatPanelId]) {
+                this.remoteStreams[chatPanelId].getTracks().forEach(track => track.stop());
+                delete this.remoteStreams[chatPanelId];
+              }
+
+              const localVideo = document.getElementById(`localVideoCall-${chatPanelId}`);
+              const remoteVideo = document.getElementById(`remoteVideoCall-${chatPanelId}`);
+
+              if (localVideo) {
+                localVideo.srcObject = null;
+                localVideo.classList.remove("active");
+              }
+
+              if (remoteVideo) {
+                remoteVideo.srcObject = null;
+                remoteVideo.classList.remove("active");
+              }
+
+              if (this.peerConnections[chatPanelId]) {
+                this.peerConnections[chatPanelId].close();
+                delete this.peerConnections[chatPanelId];
+              }
+
+              $(`#video-call-container-${chatPanelId}`).hide();
+              this.updateCallStatus(chatPanelId, "disconnected");
+
+              console.log(`Call ended for ${chatPanelId}`);
+              const { sender, recipient } = this.peerData[chatPanelId] || {};
+              if (sender && recipient) {
+                setTimeout(() => {
+                  if (!this.peerConnections[chatPanelId]) {
+                    this.initVideoCall(chatPanelId, sender, recipient);
+                  }
+                }, 1000);
+              }
+            } catch (error) {
+              console.error(`Error ending call: ${error}`);
+            }
+            finally {
+              this.callStates[chatPanelId] = 'idle';
+            }
+        }
+
+        cleanupVideoCall(chatPanelId) {
+          if (this.callSockets[chatPanelId]) {
+            this.callSockets[chatPanelId].close();
+            delete this.callSockets[chatPanelId];
+          }
+
+          if (this.peerConnections[chatPanelId]) {
+            this.peerConnections[chatPanelId].close();
+            delete this.peerConnections[chatPanelId];
+          }
+
+          if (this.localStreams[chatPanelId]) {
+            this.localStreams[chatPanelId].getTracks().forEach(track => track.stop());
+            delete this.localStreams[chatPanelId];
+          }
+
+          if (this.remoteStreams[chatPanelId]) {
+            this.remoteStreams[chatPanelId].getTracks().forEach(track => track.stop());
+            delete this.remoteStreams[chatPanelId];
+          }
+
+          const container = document.getElementById(`video-call-container-${chatPanelId}`);
+          if (container) {
+            container.style.display = "none";
+          }
+        }
+
+        updateCallStatus(chatPanelId, state) {
+          const element = document.getElementById(`call-status-${chatPanelId}`);
+          if (!element) {
+            console.warn(`Status element not found for ${chatPanelId}`);
+            return;
+          }
+
+          element.className = "connection-status";
+          const stateMap = {
+            connected: "connected",
+            completed: "connected",
+            checking: "connecting",
+            connecting: "connecting",
+            disconnected: "disconnected",
+            failed: "disconnected",
+            closed: "disconnected",
+          };
+
+          const statusClass = stateMap[state] || "disconnected";
+          element.classList.add(statusClass);
+          element.title = `Status: ${state}`;
+        }
+
+        isValidCallMessageType(type) {
+          const validTypes = [
+            "offer",
+            "answer",
+            "candidate",
+            "call_initiate",
+            "call_rejected",
+            "end_call",
+            "mute_status",
+            "video_status"
+          ];
+          return validTypes.includes(type);
+        }
+        isPeerConnectionReady(chatPanelId) {
+          return (
+            this.peerConnections[chatPanelId] &&
+            this.peerConnections[chatPanelId].signalingState !== "closed"
+          );
+        }
+        showError(chatPanelId, message) {
+          console.error(`Error for ${chatPanelId}: ${message}`);
+          alert(`Video Call Error: ${message}`);
+        }
+      }
+      const videoCall = new VideoCall();
+
       class ScreenSharing {
         constructor() {
           this.peerConnections = {};
@@ -2092,28 +3232,38 @@
                     <div class="container">
                         <div class="chat-container2">
                             <div class="messages" id="chat-messages-${chatPanelId}" class="chat-messages"></div>
-                            <div class="typing-indicator-container">
-                                <div class="typing-indicator" id="typing-indicator-${chatPanelId}">
-                                    <div class="typing-dots">
+                            <div class="typing-indicator" id="typing-indicator-${chatPanelId}">
+                                <div class="typing-dots">
                                         <div class="dot"></div>
                                         <div class="dot"></div>
                                         <div class="dot"></div>
                                     </div>
                                     <span>typing...</span>
-                                </div>
                             </div>
                             <div class="screen-share-container" id="screen-share-container-${chatPanelId}" style="display: none;">
                                 <video id="localVideo-${chatPanelId}" class="localVideo" autoplay muted></video>
                                 <video id="remoteVideo-${chatPanelId}" class="remoteVideo" autoplay></video>
                             </div>
+                            <div class="video-call-container" id="video-call-container-${chatPanelId}" style="display: none;">
+                              <video id="localVideoCall-${chatPanelId}" class="localVideo" autoplay muted></video>
+                              <video id="remoteVideoCall-${chatPanelId}" class="remoteVideo" autoplay></video>
+                              <div class="call-controls">
+                                <button class="end-call-btn" id="end-call-btn-${chatPanelId}"><img alt="end call" src="https://img.icons8.com/?size=100&id=20578&format=png&color=000000"></button>
+                                <button class="mute-btn" id="mute-btn-${chatPanelId}"><img alt="Mute" src="https://img.icons8.com/?size=100&id=JtlARuXJXaPI&format=png&color=000000"></button>
+                                <button class="video-off-btn" id="video-off-btn-${chatPanelId}"><img src="https://img.icons8.com/?size=100&id=GQ1GoxtCGHG4&format=png&color=000000" alt="Video off"></button>
+                              </div>
+                            </div>
                         </div>
                         <div class="chat-input" id="chat-input">
                             <input autocomplete="off" type="text" class="message-input" id="message-input-${chatPanelId}" placeholder="Type your message...">
                             <button id="send-btn-${chatPanelId}" class="send-btn">
-                                <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=000000" alt="send">
+                              <img src="https://img.icons8.com/?size=100&id=2837&format=png&color=000000" alt="send">
                             </button>
                             <button id="shareBtn-${chatPanelId}" class="shareBtn">
-                                <img src="https://img.icons8.com/?size=100&id=IId2iYTrumrQ&format=png&color=000000" alt="share">
+                              <img src="https://img.icons8.com/?size=100&id=IId2iYTrumrQ&format=png&color=000000" alt="share">
+                            </button>
+                            <button id="video-call-btn-${chatPanelId}" class="video-call-btn">
+                              <img src="https://img.icons8.com/?size=100&id=OomoDjxpvJzW&format=png&color=000000" alt="Video call">
                             </button>
                         </div>
                     </div>
@@ -2348,6 +3498,7 @@
             );
           }
           screenSharing.initScreenSharing(chatPanelId, sender, recipient);
+          videoCall.initVideoCall(chatPanelId, sender, recipient);
         });
         function updateUnreadCounts(unreadCounts) {
           let userItems = document.querySelectorAll(".chat-list li");
