@@ -185,14 +185,16 @@
         border-radius: 10px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         width: 100%;
-        height: auto;
+        height: fit-content;
         overflow-y: auto;
       }
 
       .video-call-container video {
+        background-color: black;
         width: 100%;
-        height: auto;
+        height: fit-content;
         object-fit: cover;
+        overflow-y: auto;
       }
 
       .call-controls {
@@ -201,7 +203,7 @@
         left: 50%;
         align-items: center;
         transform: translateX(-50%);
-        display: flex;
+      display: flex;
         gap: 15px;
         z-index: 1000;
       }
@@ -1563,7 +1565,6 @@
           this.callCooldowns[chatPanelId] = Date.now();
           this.callStates[chatPanelId] = 'initiating';
           try {
-
             console.log(`Starting call for ${chatPanelId}`);
             if (this.callSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
               const waitingUI = $(`
@@ -1757,9 +1758,7 @@
               console.error("Remote video element not found");
               return;
             }
-            if (remoteVideo.srcObject) {
-              remoteVideo.srcObject.getTracks().forEach(track => track.stop());
-            }
+
             if (!this.remoteStreams[chatPanelId] && event.streams && event.streams.length > 0) {
               this.remoteStreams[chatPanelId] = event.streams[0];
               remoteVideo.srcObject = this.remoteStreams[chatPanelId];
@@ -1784,10 +1783,9 @@
             console.log(`Connection state changed to ${state} for ${chatPanelId}`);
             if (state === "failed") {
               console.log("ICE failed - restarting ICE");
-              console.log("Connection failed - attempting restart");
+              pc.restartIce();
               setTimeout(() => {
-                if (pc.connectionState !== 'connected') {
-                  this.cleanupVideoCall(chatPanelId);
+                if (!this.peerConnections[chatPanelId]) {
                   this.initVideoCall(chatPanelId, this.peerData[chatPanelId].sender,
                                    this.peerData[chatPanelId].recipient);
                 }
@@ -1978,10 +1976,6 @@
             if (this.ignoreOffer[chatPanelId]) {
               console.log(`Ignoring offer for ${chatPanelId} due to collision`);
               return;
-            }
-            if (pc.signalingState === 'closed') {
-              await this.createPeerConnection(chatPanelId);
-              return this.queueMessage(chatPanelId, { type: "offer", offer });
             }
 
             await pc.setRemoteDescription(new RTCSessionDescription(offer));
@@ -2726,7 +2720,7 @@
           if (sender && recipient) {
             setTimeout(() => {
               this.initScreenSharing(chatPanelId, sender, recipient);
-            }, 2000);
+            }, 5000);
           }
         }
         ensureVideoPlayback(videoElement, chatPanelId, attempt = 0) {
@@ -2753,7 +2747,7 @@
                     chatPanelId,
                     attempt + 1
                   );
-                }, 500);
+                }, 10000);
               }
             });
         }
@@ -2942,7 +2936,6 @@
               this.peerConnections[chatPanelId].close();
               delete this.peerConnections[chatPanelId];
             }
-            $(`#screen-share-container-${chatPanelId}`).hide();
             this.updateConnectionStatus(chatPanelId, "disconnected");
             if (this.shareSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
               this.shareSockets[chatPanelId].send(
@@ -2957,7 +2950,7 @@
             if (sender && recipient) {
                 setTimeout(() => {
                     this.initScreenSharing(chatPanelId, sender, recipient);
-                }, 1000);
+                }, 10000);
             }
           } catch (error) {
             console.error(`Error stopping screen share: ${error}`);
@@ -3116,80 +3109,6 @@
           updateChatPanelPositions();
         });
         let panelOffset = 0;
-        function updateNavigationControls(showControls) {
-            $('.chat-navigation-controls').remove();
-            const visiblePanels = chatPanels.filter(id => !$(`#${id}`).hasClass('minimized'));
-            const maxVisible = 3;
-            if (visiblePanels.length > maxVisible) {
-                const controls = $(`
-                    <div class="chat-navigation-controls">
-                        <button class="nav-prev" ${panelOffset === 0 ? 'disabled' : ''}><</button>
-                        <span class="nav-status">${Math.min(panelOffset + 1, visiblePanels.length - maxVisible + 1)}/${visiblePanels.length - maxVisible + 1}</span>
-                        <button class="nav-next" ${panelOffset >= visiblePanels.length - maxVisible ? 'disabled' : ''}>></button>
-                    </div>
-                `);
-                $('body').append(controls);
-                controls.css({
-                    position: 'fixed',
-                    bottom: '200px',
-                    left: '120px',
-                    zIndex: 1100,
-                    display: 'flex',
-                    gap: '5px',
-                    alignItems: 'center'
-                });
-                controls.find('button').css({
-                    width: '30px',
-                    height: '30px',
-                    borderRadius: '50%',
-                    background: '#4e73df',
-                    color: 'white',
-                    border: 'none',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold'
-                });
-                controls.find('button:disabled').css({
-                    opacity: '0.5',
-                    cursor: 'not-allowed'
-                });
-                controls.find('.nav-status').css({
-                    fontSize: '12px',
-                    padding: '0 5px'
-                });
-                controls.find('.nav-prev').click(() => navigatePanels(-1));
-                controls.find('.nav-next').click(() => navigatePanels(1));
-            }
-        }
-        function navigatePanels(direction) {
-            const visiblePanels = chatPanels.filter(id => !$(`#${id}`).hasClass('minimized'));
-            const maxVisible = 3;
-            const totalPanels = visiblePanels.length;
-            panelOffset = Math.max(0, Math.min(panelOffset + direction, totalPanels - maxVisible));
-            const startIndex = panelOffset;
-            const endIndex = startIndex + maxVisible;
-            const panelsToShow = visiblePanels.slice(startIndex, endIndex);
-            const chatListPanelOpen = $('.chat-panel').hasClass('active');
-            const startRight = chatListPanelOpen ? 310 : 20;
-            const panelWidth = 300;
-            const gap = 8;
-            visiblePanels.forEach(panelId => {
-                $(`#${panelId}`).css({
-                    display: 'none'
-                });
-            });
-            panelsToShow.forEach((panelId, index) => {
-                const position = startRight + (index * (panelWidth + gap));
-                $(`#${panelId}`).css({
-                    right: position + 'px',
-                    display: 'block',
-                    zIndex: 1030 + index
-                });
-            });
-            updateNavigationControls(totalPanels > maxVisible);
-        }
         function updateChatPanelPositions() {
             const chatListPanelOpen = $('.chat-panel').hasClass('active');
             const visiblePanels = chatPanels.filter(id => !$(`#${id}`).hasClass('minimized'));
@@ -3200,22 +3119,35 @@
             const panelWidth = 300;
             const gap = 8;
             const maxVisible = 3;
-            const panelsToShow = visiblePanels.slice(panelOffset, panelOffset + maxVisible);
-            visiblePanels.forEach(panelId => {
-                $(`#${panelId}`).css({
-                    display: 'none'
-                });
-            });
+            const totalVisible = Math.min(maxVisible, visiblePanels.length);
+            const panelsToShow = [];
+            for (let i = 0; i < totalVisible; i++) {
+                const index = (panelOffset + i) % visiblePanels.length;
+                panelsToShow.push(visiblePanels[index]);
+            }
+            const rightMostPosition = startRight + ((totalVisible - 1) * (panelWidth + gap));
             panelsToShow.forEach((panelId, index) => {
-                const position = startRight + (index * (panelWidth + gap));
+                const position = rightMostPosition - (index * (panelWidth + gap));
                 $(`#${panelId}`).css({
                     right: position + 'px',
                     display: 'block',
-                    zIndex: 1030 + index
+                    zIndex: 1030 + (totalVisible - index)
                 });
             });
-            updateNavigationControls(visiblePanels.length > maxVisible);
         }
+        window.addEventListener('wheel', function(e) {
+            const visiblePanels = chatPanels.filter(id => !$(`#${id}`).hasClass('minimized'));
+            const maxVisible = 3;
+            const totalPanels = visiblePanels.length;
+            if (totalPanels <= maxVisible) return;
+            e.preventDefault();
+            if (e.deltaY > 0) {
+                panelOffset = (panelOffset + 1) % totalPanels;
+            } else {
+                panelOffset = (panelOffset - 1 + totalPanels) % totalPanels;
+            }
+            updateChatPanelPositions();
+        }, { passive: false });
         $(".chat-list li").click(function () {
           let username = $(this).data("username");
           let userId = $(this).data("id");
@@ -3265,19 +3197,20 @@
                         <div class="chat-container2">
                           <div class="messages" id="chat-messages-${chatPanelId}" class="chat-messages"></div>
                             <div class="media-containers">
-                                <div class="screen-share-container" id="screen-share-container-${chatPanelId}" style="display: none;">
-                                    <video id="localVideo-${chatPanelId}" class="localVideo" autoplay muted></video>
-                                    <video id="remoteVideo-${chatPanelId}" class="remoteVideo" autoplay></video>
-                                </div>
-                                <div class="video-call-container" id="video-call-container-${chatPanelId}" style="display: none;">
-                                    <video id="localVideoCall-${chatPanelId}" class="localVideo" autoplay muted></video>
-                                    <video id="remoteVideoCall-${chatPanelId}" class="remoteVideo" autoplay></video>
-                                    <div class="call-controls">
-                                        <button class="end-call-btn" id="end-call-btn-${chatPanelId}"><img alt="end call" src="https://img.icons8.com/?size=100&id=20578&format=png&color=000000"></button>
-                                        <button class="mute-btn" id="mute-btn-${chatPanelId}"><img alt="Mute" src="https://img.icons8.com/?size=100&id=JtlARuXJXaPI&format=png&color=000000"></button>
-                                        <button class="video-off-btn" id="video-off-btn-${chatPanelId}"><img src="https://img.icons8.com/?size=100&id=GQ1GoxtCGHG4&format=png&color=000000" alt="Video off"></button>
-                                    </div>
-                                </div>
+
+                              <div class="video-call-container" id="video-call-container-${chatPanelId}" style="display: none;">
+                                  <video id="localVideoCall-${chatPanelId}" class="localVideo" autoplay muted></video>
+                                  <video id="remoteVideoCall-${chatPanelId}" class="remoteVideo" autoplay></video>
+                                  <div class="call-controls">
+                                      <button class="end-call-btn" id="end-call-btn-${chatPanelId}"><img alt="end call" src="https://img.icons8.com/?size=100&id=20578&format=png&color=000000"></button>
+                                      <button class="mute-btn" id="mute-btn-${chatPanelId}"><img alt="Mute" src="https://img.icons8.com/?size=100&id=JtlARuXJXaPI&format=png&color=000000"></button>
+                                      <button class="video-off-btn" id="video-off-btn-${chatPanelId}"><img src="https://img.icons8.com/?size=100&id=GQ1GoxtCGHG4&format=png&color=000000" alt="Video off"></button>
+                                  </div>
+                              </div>
+                              <div class="screen-share-container" id="screen-share-container-${chatPanelId}" style="display: none;">
+                                  <video id="localVideo-${chatPanelId}" class="localVideo" autoplay muted></video>
+                                  <video id="remoteVideo-${chatPanelId}" class="remoteVideo" autoplay></video>
+                              </div>
                             </div>
                           </div>
                           <div class="chat-input" id="chat-input">
