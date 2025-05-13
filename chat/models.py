@@ -1,10 +1,11 @@
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from django.db import models
-from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.db import models
+from django.contrib.auth.models import User
+
 
 class UserStatus(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -112,3 +113,30 @@ class Feedback(models.Model):
 
     def __str__(self):
         return f"Feedback on {self.created_at}"
+
+class CallHistory(models.Model):
+    CALL_TYPES = (
+        ('video', 'Video Call'),
+        ('audio', 'Audio Call'),
+    )
+    CALL_STATUS = (
+        ('missed', 'Missed'),
+        ('completed', 'Completed'),
+        ('rejected', 'Rejected'),
+    )
+
+    caller = models.ForeignKey(User, related_name='outgoing_calls', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, related_name='incoming_calls', on_delete=models.CASCADE)
+    call_type = models.CharField(max_length=10, choices=CALL_TYPES)
+    status = models.CharField(max_length=10, choices=CALL_STATUS)
+    start_time = models.DateTimeField(auto_now_add=True)
+    end_time = models.DateTimeField(null=True, blank=True)
+    duration = models.DurationField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-start_time']
+
+    def save(self, *args, **kwargs):
+        if self.end_time and self.start_time:
+            self.duration = self.end_time - self.start_time
+        super().save(*args, **kwargs)

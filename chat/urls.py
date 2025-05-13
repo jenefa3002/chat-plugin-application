@@ -8,6 +8,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('get_call_history/', views.get_call_history, name='get_call_history'),
+    path('log_missed_call/', views.log_missed_call, name='log_missed_call'),
+    path('log_rejected_call/', views.log_rejected_call, name='log_rejected_call'),
+    path('log_completed_call/', views.log_completed_call, name='log_completed_call'),
     path('refresh-captcha/', captcha_refresh, name='captcha-refresh'),
     path('get-response/', views.chatbot_response, name='chatbot_response'),
     path('save-feedback/', views.save_feedback, name='save_feedback'),

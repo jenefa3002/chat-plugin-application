@@ -33,6 +33,195 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
     <style>
+      .missed-call-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 250px;
+        padding: 15px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 2000;
+        animation: slideIn 0.3s ease-out;
+        border-left: 4px solid #ff4757;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .missed-call-notification:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+      .missed-call-content {
+          display: flex;
+          align-items: center;
+      }
+
+      .missed-call-icon {
+          margin-right: 15px;
+          color: #ff4757;
+          font-size: 8px;
+      }
+
+      .missed-call-details {
+          flex: 1;
+      }
+
+      .missed-call-title {
+          font-weight: bold;
+          margin-bottom: 5px;
+      }
+
+      .missed-call-caller {
+          color: #555;
+          margin-bottom: 3px;
+      }
+
+      .missed-call-time {
+          color: #777;
+          font-size: 8px;
+      }
+
+      .fade-out {
+          animation: fadeOut 0.5s ease-out forwards;
+      }
+
+      @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+      }
+
+      @keyframes fadeOut {
+          from { opacity: 1; }
+          to { opacity: 0; transform: translateX(100%); }
+      }
+      .call-history-panel {
+          font-family: Georgia, serif;
+          position: fixed;
+          bottom: 0px;
+          right: 20px;
+          width: 150px;
+          height: 400px;
+          background: white;
+          border-radius: 10px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+          transition: all 0.3s ease-in-out;
+          z-index: 1040;
+          display: flex;
+          overflow: hidden;
+          flex-direction: column;
+      }
+
+      .call-history-header {
+          padding: 10px;
+          background: #4e73df;
+          color: white;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+
+      .call-history-header h3 {
+          margin: 0;
+          font-size: 12px;
+      }
+
+      .call-history-button img{
+        color: white;
+        height : 21px;
+        font-weight: bold;
+      }
+
+      .close-call-history {
+          background: none;
+          border: none;
+          color: white;
+          font-size: 12px;
+          cursor: pointer;
+      }
+
+      .call-history-list {
+          flex: 1;
+          overflow-y: auto;
+          padding: 2px;
+      }
+
+      .call-history-item {
+          display: flex;
+          padding: 4px;
+          margin-bottom: 10px;
+          border-radius: 8px;
+          background: #f8f9fc;
+          transition: background 0.2s;
+      }
+
+      .call-history-item:hover {
+          background: #e9ecef;
+      }
+
+      .call-icon {
+          width: 15px;
+          height: 15px;
+          border-radius: 50%;
+          background: #e9ecef;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 12px;
+          color: #4e73df;
+      }
+
+      .call-details {
+          flex: 1;
+      }
+
+      .call-direction {
+          font-size: 11px;
+          font-weight: bold;
+          margin-bottom: 3px;
+      }
+
+      .call-participant {
+          color: #555;
+          margin-bottom: 3px;
+          font-size: 8px;
+      }
+
+      .call-status {
+          font-size: 8px;
+          padding: 2px 4px;
+          border-radius: 4px;
+          display: inline-block;
+          margin-bottom: 2px;
+      }
+
+      .call-status.missed {
+          background: #ffecec;
+          color: #ff4757;
+      }
+
+      .call-status.completed {
+          background: #e6f7ee;
+          color: #28a745;
+      }
+
+      .call-status.rejected {
+          background: #fff3e6;
+          color: #fd7e14;
+      }
+
+      .call-time {
+          color: #777;
+          font-size: 8px;
+      }
+
+      .no-calls {
+          text-align: center;
+          padding: 20px;
+          color: #777;
+      }
       .call-waiting-modal {
         position: fixed;
         top: 0;
@@ -307,6 +496,7 @@
           }
       }
       .maximize-chat {
+        position: center;
         background: none;
         border: none;
         color: white;
@@ -1296,12 +1486,15 @@
         <img src="{% static 'img/image03.png' %}" alt="Chat" />
         <span class="chat-notification" id="chat-notification">!</span>
       </button>
-
       <div class="chat-panel">
         <div class="chat-header">
           <h5>Chatty</h5>
-          <button class="close-chat">&times;</button>
+          <div>
+            <button class="call-history-button"><img src="https://img.icons8.com/?size=100&id=64894&format=png&color=000000" alt="call-history"></button>
+            <button class="close-chat">&times;</button>
+          </div>
         </div>
+
         <ul class="chat-list">
           {% for user in users %}
           <li data-username="{{ user.username }}" data-id="{{ user.id }}">
@@ -1326,10 +1519,118 @@
           {% endfor %}
         </ul>
       </div>
+      <div class="call-history-panel" style="display: none;">
+          <div class="call-history-header">
+              <h3>Call History</h3>
+              <button class="close-call-history">&times;</button>
+          </div>
+          <div class="call-history-list"></div>
+      </div>
       <div class="chat-content-panel"></div>
     </div>
     {% include 'chatbot.html' %}
     <script>
+      $(document).ready(function() {
+          $('.call-history-button').click(function() {
+              loadCallHistory();
+              $('.call-history-panel').show();
+          });
+
+          $('.close-call-history').click(function() {
+              $('.call-history-panel').hide();
+          });
+      });
+
+      function loadCallHistory() {
+    $.ajax({
+        url: '/get_call_history/',
+        type: 'GET',
+        success: function(data) {
+            const historyList = $('.call-history-list');
+            historyList.empty();
+
+            if (data.history && data.history.length === 0) {
+                historyList.append('<div class="no-calls">No call history found</div>');
+                return;
+            }
+
+            // Sort by timestamp (newest first)
+            data.history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            data.history.forEach(call => {
+                // Determine status class and icon based on call status
+                let statusClass, statusText, statusIcon;
+
+                switch(call.status) {
+                    case 'completed':
+                        statusClass = 'completed';
+                        statusText = 'Completed';
+                        statusIcon = 'fa-check-circle';
+                        break;
+                    case 'missed':
+                        statusClass = 'missed';
+                        statusText = 'Missed';
+                        statusIcon = 'fa-phone-slash';
+                        break;
+                    case 'rejected':
+                        statusClass = 'rejected';
+                        statusText = 'Rejected';
+                        statusIcon = 'fa-times-circle';
+                        break;
+                    case 'offline':
+                        statusClass = 'offline';
+                        statusText = 'User Offline';
+                        statusIcon = 'fa-user-slash';
+                        break;
+                    case 'timeout':
+                        statusClass = 'timeout';
+                        statusText = 'No Answer';
+                        statusIcon = 'fa-clock';
+                        break;
+                    default:
+                        statusClass = 'other';
+                        statusText = call.status;
+                        statusIcon = 'fa-question-circle';
+                }
+
+                const callItem = $(`
+                    <div class="call-history-item ${statusClass}">
+                        <div class="call-icon">
+                            <i class="fas ${call.call_type === 'video' ? 'fa-video' : 'fa-phone'}"></i>
+                        </div>
+                        <div class="call-details">
+                            <div class="call-direction">
+                                ${call.direction === 'outgoing' ? 'Outgoing' : 'Incoming'} ${call.call_type} call
+                            </div>
+                            <div class="call-participant">
+                                ${call.direction === 'outgoing' ? 'To: ' + call.other_user : 'From: ' + call.other_user}
+                            </div>
+                            <div class="call-status ${statusClass}">
+                                <i class="fas ${statusIcon}"></i> ${statusText}
+                            </div>
+                            <div class="call-time">
+                                ${new Date(call.timestamp).toLocaleString()}
+                                ${call.duration ? ' • ' + formatDuration(call.duration) : ''}
+                            </div>
+                        </div>
+                    </div>
+                `);
+                historyList.append(callItem);
+            });
+        },
+        error: function(error) {
+            console.error('Error loading call history:', error);
+            $('.call-history-list').html('<div class="no-calls">Error loading call history</div>');
+        }
+    });
+}
+
+      function formatDuration(seconds) {
+          if (!seconds) return '';
+          const minutes = Math.floor(seconds / 60);
+          const remainingSeconds = seconds % 60;
+          return `${minutes}m`;
+      }
       class VideoCall {
         constructor() {
           this.peerConnections = {};
@@ -1565,6 +1866,7 @@
           this.callCooldowns[chatPanelId] = Date.now();
           this.callStates[chatPanelId] = 'initiating';
           try {
+             this.setupCallTimeout(chatPanelId, sender, recipient);
             console.log(`Starting call for ${chatPanelId}`);
             if (this.callSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
               const waitingUI = $(`
@@ -1583,7 +1885,7 @@
                 </div>
               `);
 
-              $('.chat-container').append(waitingUI);
+              $(`#${chatPanelId} .chat-container`).append(waitingUI);
               waitingUI.find('.cancel-call').click(() => {
                 this.endCall(chatPanelId);
                 waitingUI.remove();
@@ -1625,13 +1927,7 @@
                   hasAudio: this.localStreams[chatPanelId].getAudioTracks().length > 0
                 }));
               }
-              this.callTimeouts[chatPanelId] = setTimeout(() => {
-                if (this.callStates[chatPanelId] === 'initiating') {
-                  this.showNotification(chatPanelId, "Call not answered");
-                  this.endCall(chatPanelId);
-                  waitingUI.remove();
-                }
-              }, 20000);
+              this.setupCallTimeout(chatPanelId, sender, recipient);
             } catch (error) {
               console.error(`Error getting media devices: ${error}`);
               waitingUI.remove();
@@ -1652,6 +1948,41 @@
             this.callStates[chatPanelId] = 'idle';
             throw error;
           }
+        }
+        setupCallTimeout(chatPanelId, sender, recipient) {
+          if (this.callTimeouts[chatPanelId]) {
+            clearTimeout(this.callTimeouts[chatPanelId]);
+          }
+            this.callTimeouts[chatPanelId] = setTimeout(async () => {
+            if (this.callStates[chatPanelId] === 'initiating') {
+                console.log(`Call timeout reached for ${chatPanelId}`);
+                if (this.callSockets[chatPanelId]?.readyState === WebSocket.OPEN) {
+                    this.callSockets[chatPanelId].send(JSON.stringify({
+                        type: "call_rejected",
+                        sender: recipient,
+                        recipient: sender,
+                        reason: "timeout"
+                    }));
+                }
+                try {
+                    await this.logMissedCall(chatPanelId, sender, recipient);
+                    showMissedCallNotification({
+                        caller: sender,
+                        receiver: recipient,
+                        call_type: 'video',
+                        timestamp: new Date().toISOString()
+                    });
+                    tabNotifier.showNotification(`Missed video call from ${sender}`);
+                    if ($('.call-history-panel').is(':visible')) {
+                        loadCallHistory();
+                    }
+                } catch (error) {
+                    console.error('Error handling missed call:', error);
+                }
+                this.endCall(chatPanelId);
+                $(`#call-waiting-${chatPanelId}`).remove();
+            }
+          }, 5000);
         }
         setAudioOnlyUI(chatPanelId, isAudioOnly) {
           const container = document.getElementById(`video-call-container-${chatPanelId}`);
@@ -1741,13 +2072,18 @@
             const state = pc.iceConnectionState;
             console.log(`ICE connection state changed to ${state} for ${chatPanelId}`);
             this.updateCallStatus(chatPanelId, state);
-            if (pc.iceConnectionState === "failed") {
-              console.log("ICE failed - restarting in 1s");
-              setTimeout(() => {
-                if (pc.iceConnectionState !== "closed") {
-                  pc.restartIce();
+            if (state === "failed") {
+                const { sender, recipient } = this.peerData[chatPanelId] || {};
+                if (sender && recipient) {
+                    this.logMissedCall(chatPanelId, sender, recipient);
+                    showMissedCallNotification({
+                        caller: sender,
+                        receiver: recipient,
+                        call_type: 'video',
+                        timestamp: new Date().toISOString()
+                    });
                 }
-              }, 10000);
+                this.endCall(chatPanelId);
             }
           };
 
@@ -1863,12 +2199,6 @@
           }
         }
 
-        async handleCallRejection(chatPanelId, data) {
-          console.log(`Call rejected by ${data.sender}`);
-          this.showNotification(chatPanelId, `${data.sender} rejected the call`);
-          await this.endCall(chatPanelId);
-        }
-
         handleConnectionSuccess(chatPanelId) {
             console.log(`Connection established for ${chatPanelId}`);
             const statusElement = document.getElementById(`call-status-${chatPanelId}`);
@@ -1919,7 +2249,7 @@
             </div>
           `);
 
-          $('.chat-content-panel').append(confirmation);
+          $(`#${chatPanelId} .chat-container`).append(confirmation);
 
           return new Promise((resolve) => {
             confirmation.find('.accept-call').click(async () => {
@@ -2042,13 +2372,6 @@
                 checkDesc();
               });
             }
-<!--            if (candidate.candidate.includes("typ host") &&-->
-<!--                pc.remoteDescription &&-->
-<!--                pc.remoteDescription.type === "answer") {-->
-<!--              console.log("Skipping host candidate after answer");-->
-<!--              return;-->
-<!--            }-->
-
             await pc.addIceCandidate(new RTCIceCandidate(candidate));
           } catch (err) {
             if (!this.ignoreOffer[chatPanelId]) {
@@ -2102,8 +2425,102 @@
             }
           }
         }
+          async logMissedCall(chatPanelId, caller, receiver) {
+            try {
+                const csrfToken = getCookie('csrftoken');
+                if (!csrfToken) throw new Error("CSRF token not found");
+                const response = await fetch('/log_missed_call/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        caller: caller,
+                        receiver: receiver,
+                        call_type: 'video'
+                    })
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Error logging missed call:', error);
+                throw error;
+            }
+          }
+
+          async handleCallRejection(chatPanelId, data) {
+            console.log(`Call rejected by ${data.sender}`);
+            const rejectionMessage = data.reason === "timeout"
+            ? `${data.sender} didn't answer`
+            : `${data.sender} rejected the call`;
+            this.showMissedCallNotification(data);
+            this.showNotification(chatPanelId, rejectionMessage);
+              try {
+              const endpoint = data.reason === "timeout"
+                  ? '/log_missed_call/'
+                  : '/log_rejected_call/';
+              const response = await fetch(endpoint, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRFToken': getCookie('csrftoken'),
+                  },
+                  body: JSON.stringify({
+                      caller: data.recipient,
+                      receiver: data.sender,
+                      call_type: 'video',
+                      duration: 0
+                  })
+              });
+
+              if (!response.ok) {
+                  console.error('Failed to log call');
+              }
+              if (data.reason === "timeout") {
+                  showMissedCallNotification({
+                      caller: data.recipient,
+                      receiver: data.sender,
+                      call_type: 'video',
+                      timestamp: new Date().toISOString()
+                  });
+
+                  tabNotifier.showNotification(`Missed video call from ${data.recipient}`);
+              }
+          } catch (error) {
+              console.error('Error logging call:', error);
+          }
+          await this.endCall(chatPanelId);
+        }
 
         async endCall(chatPanelId) {
+        if (this.callStates[chatPanelId] === 'active') {
+            const { sender, recipient } = this.peerData[chatPanelId] || {};
+            if (sender && recipient) {
+                try {
+                    const response = await fetch('/log_completed_call/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken'),
+                        },
+                        body: JSON.stringify({
+                            caller: sender,
+                            receiver: recipient,
+                            call_type: 'video'
+                        })
+                    });
+
+                    if (!response.ok) {
+                        console.error('Failed to log completed call');
+                    }
+                } catch (error) {
+                    console.error('Error logging completed call:', error);
+                }
+            }
+          }
           if (this.callStates[chatPanelId] === 'ending' || this.callStates[chatPanelId] === 'idle') {
             return;
           }
@@ -2247,6 +2664,82 @@
         showError(chatPanelId, message) {
           console.error(`Error for ${chatPanelId}: ${message}`);
           alert(`Video Call Error: ${message}`);
+        }
+      }
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+      }
+      const callNotificationSocket = new WebSocket(
+          window.location.protocol === "https:"
+              ? `wss://${window.location.host}/ws/call_notifications/`
+              : `ws://${window.location.host}/ws/call_notifications/`
+      );
+      callNotificationSocket.onmessage = function(event) {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'missed_call') {
+              showMissedCallNotification(data);
+              tabNotifier.showNotification(`Missed ${data.call_type} call from ${data.caller}`);
+          }
+        } catch (e) {
+          console.error("Error processing call notification:", e);
+        }
+      };
+
+      function showMissedCallNotification(data) {
+        if (document.hidden || data.call_type === 'video') {
+            const existingNotification = document.querySelector('.missed-call-notification');
+            if (existingNotification) existingNotification.remove();
+
+            const notification = document.createElement('div');
+            notification.className = 'missed-call-notification';
+            notification.innerHTML = `
+                <div class="missed-call-content">
+                    <div class="missed-call-icon">
+                        <i class="fas fa-phone-slash"></i>
+                    </div>
+                    <div class="missed-call-details">
+                        <div class="missed-call-title">Missed ${data.call_type} call</div>
+                        <div class="missed-call-caller">From: ${data.caller}</div>
+                        <div class="missed-call-time">${new Date(data.timestamp).toLocaleTimeString()}</div>
+                    </div>
+                </div>
+            `;
+            notification.onclick = function() {
+                const chatPanelId = `chat-panel-${data.caller}-${data.caller_id}`;
+                const panel = document.getElementById(chatPanelId);
+                if (panel) {
+                    panel.style.display = 'block';
+                    panel.style.zIndex = '9999';
+                }
+                notification.remove();
+            };
+
+            document.body.appendChild(notification);
+
+            try {
+                const audio = new Audio('{% static "sounds/missed_call_alert.mp3" %}');
+                audio.volume = 0.3;
+                audio.play().catch(e => console.log("Audio play failed:", e));
+            } catch (e) {
+                console.log("Audio error:", e);
+            }
+
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 500);
+            }, 5000);
         }
       }
       const videoCall = new VideoCall();
@@ -3333,28 +3826,26 @@
                 }
             }
           };
+          let zIndexCounter = 1100;
           $(document).on('click', '.maximize-chat', function() {
-          const panelId = $(this).data('id');
-          const panel = $(`#${panelId}`);
-          panel.toggleClass('maximized');
-          markMessagesAsRead(username);
-          const button = $(this);
-          if (panel.hasClass('maximized')) {
-              button.text('❐');
-          } else {
+            const panelId = $(this).data('id');
+            const panel = $(`#${panelId}`);
+            const button = $(this);
+            if (panel.hasClass('maximized')) {
+              panel.removeClass('maximized').css('z-index', '1030');
               button.text('□');
-          }
-          if (panel.hasClass('maximized')) {
-              panel.css('z-index', '1100');
-          } else {
-              panel.css('z-index', '1030');
-          }
-          if (panel.hasClass('maximized')) {
-              $(`#screen-share-container-${panelId}`).css('height', '50%');
-          } else {
               $(`#screen-share-container-${panelId}`).css('height', 'auto');
-          }
-         });
+            } else {
+              panel.addClass('maximized').css('z-index', ++zIndexCounter);
+              button.text('❐');
+              $(`#screen-share-container-${panelId}`).css('height', '50%');
+            }
+            markMessagesAsRead(username);
+          });
+          $(document).on('click', '.chat-content-panel.maximized', function() {
+            $(this).css('z-index', ++zIndexCounter);
+          });
+
          $(document).on('click', '.minimize-chat', function() {
             const panelId = $(this).data('id');
             const panel = $(`#${panelId}`);

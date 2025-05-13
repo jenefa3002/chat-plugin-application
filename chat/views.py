@@ -1,4 +1,7 @@
 import os
+from datetime import timedelta
+
+from . import models
 from .forms import LoginForm
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -16,7 +19,7 @@ from keras.src.utils import pad_sequences
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from .models import Feedback
+from .models import Feedback, CallHistory
 from .models import PrivateMessage
 from django.shortcuts import render
 from django.contrib.auth.models import User
@@ -324,3 +327,102 @@ def custom_csrf_failure_view(request, reason=""):
 
 def custom_500_view(request, exception):
     return render(request, '500.html', status=500)
+
+from django.views.decorators.http import require_POST
+
+@require_POST
+@csrf_exempt
+@login_required
+def log_missed_call(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            caller = get_object_or_404(User, username=data['caller'])
+            receiver = request.user
+
+            # Create call history record
+            call = CallHistory.objects.create(
+                caller=caller,
+                receiver=receiver,
+                call_type=data.get('call_type', 'video'),
+                status='missed',
+                duration=timedelta(seconds=0))
+
+            # Notify via WebSocket
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f"notifications_{receiver.username}",
+                {
+                    'type': 'missed_call',
+                    'caller': caller.username,
+                    'caller_id': caller.id,
+                    'receiver': receiver.username,
+                    'call_type': data.get('call_type', 'video'),
+                    'timestamp': timezone.now().isoformat()
+                }
+            )
+
+            return JsonResponse({'status': 'success'})
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@require_POST
+@csrf_exempt
+@login_required
+def log_rejected_call(request):
+    data = json.loads(request.body)
+    caller = User.objects.get(username=data['caller'])
+    receiver = request.user
+
+    CallHistory.objects.create(
+        caller=caller,
+        receiver=receiver,
+        call_type=data['call_type'],
+        status='rejected'
+    )
+
+    return JsonResponse({'status': 'success'})
+
+from django.utils import timezone
+
+@require_POST
+@csrf_exempt
+@login_required
+def log_completed_call(request):
+    data = json.loads(request.body)
+    caller = request.user
+    receiver = User.objects.get(username=data['receiver'])
+
+    call = CallHistory.objects.create(
+        caller=caller,
+        receiver=receiver,
+        call_type=data['call_type'],
+        status='completed',
+        start_time=timezone.now()
+    )
+    call.end_time = timezone.now()
+    call.save()
+
+    return JsonResponse({'status': 'success'})
+
+@login_required
+def get_call_history(request):
+    calls = CallHistory.objects.filter(
+        models.Q(caller=request.user) | models.Q(receiver=request.user)
+    ).order_by('-start_time')[:50]
+    history = []
+    for call in calls:
+        history.append({
+            'id': call.id,
+            'call_type': call.call_type,
+            'status': call.status,
+            'timestamp': call.start_time.isoformat(),
+            'duration': call.duration.total_seconds() if call.duration else None,
+            'direction': 'outgoing' if call.caller == request.user else 'incoming',
+            'other_user': call.receiver.username if call.caller == request.user else call.caller.username
+        })
+
+    return JsonResponse({'history': history})

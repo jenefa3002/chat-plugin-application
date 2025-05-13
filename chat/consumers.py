@@ -1,12 +1,15 @@
-import json
 from collections import defaultdict
 from django.utils import timezone
 from channels.db import database_sync_to_async
-from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
-from asgiref.sync import sync_to_async
-from django.contrib.auth.models import User
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 import logging
 from .models import PrivateMessage, UserStatus
+import json
+from channels.generic.websocket import AsyncWebsocketConsumer
+from django.contrib.auth.models import User
+from asgiref.sync import sync_to_async
+from .models import CallHistory
+
 
 logger = logging.getLogger(__name__)
 
@@ -336,3 +339,68 @@ class VideoCallConsumer(AsyncWebsocketConsumer):
     async def videocall_message(self, event):
         data = event['data']
         await self.send(text_data=json.dumps(data))
+
+
+class CallNotificationConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user = self.scope['user']
+        if self.user.is_anonymous:
+            await self.close()
+        else:
+            self.room_group_name = f'call_notifications_{self.user.id}'
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name
+            )
+            await self.accept()
+
+    async def disconnect(self, close_code):
+        if hasattr(self, 'room_group_name'):
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        if data['type'] == 'missed_call':
+            await self.handle_missed_call(data)
+        if data['type'] == 'missed_call':
+            await self.channel_layer.group_send(
+                f"notifications_{self.recipient}",
+                {
+                    'type': 'missed_call',
+                    'caller': self.sender,
+                    'recipient': self.recipient,
+                    'call_type': 'video',
+                }
+            )
+
+    async def handle_missed_call(self, data):
+        caller = await sync_to_async(User.objects.get)(username=data['caller'])
+        receiver = await sync_to_async(User.objects.get)(username=data['receiver'])
+
+        await sync_to_async(CallHistory.objects.create)(
+            caller=caller,
+            receiver=receiver,
+            call_type=data['call_type'],
+            status='missed'
+        )
+
+        await self.channel_layer.group_send(
+            f'call_notifications_{receiver.id}',
+            {
+                'type': 'missed_call_notification',
+                'caller': data['caller'],
+                'call_type': data['call_type'],
+                'timestamp': str(timezone.now())
+            }
+        )
+
+    async def missed_call_notification(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'missed_call',
+            'caller': event['caller'],
+            'call_type': event['call_type'],
+            'timestamp': event['timestamp']
+        }))
