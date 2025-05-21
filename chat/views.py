@@ -1,6 +1,9 @@
 import os
 from datetime import timedelta
 
+from django.utils import timezone
+from django.utils.timezone import now
+
 from . import models
 from .forms import LoginForm
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
@@ -330,90 +333,142 @@ def custom_500_view(request, exception):
 
 from django.views.decorators.http import require_POST
 
+
 @require_POST
 @csrf_exempt
 @login_required
 def log_missed_call(request):
+    try:
+        data = json.loads(request.body)
+        caller = get_object_or_404(User, username=data['caller'])
+        receiver = request.user
+        recent_missed = CallHistory.objects.filter(
+            caller=caller,
+            receiver=receiver,
+            status__in=['missed', 'timeout', 'offline'],
+            start_time__gte=timezone.now() - timedelta(seconds=5)
+        ).exists()
+
+        if recent_missed:
+            return JsonResponse({'status': 'duplicate_ignored'})
+
+        duplicate = CallHistory.objects.filter(
+            caller=caller,
+            receiver=receiver,
+            status__in=['missed', 'timeout', 'offline'],
+            start_time__gte=timezone.now() - timedelta(seconds=10)
+        ).exists()
+
+        if duplicate:
+            return JsonResponse({'status': 'duplicate_ignored'})
+
+        call = CallHistory.objects.create(
+            caller=caller,
+            receiver=receiver,
+            call_type=data.get('call_type', 'video'),
+            status=data.get('reason', 'missed'),
+            start_time=timezone.now(),
+            end_time=timezone.now()
+        )
+
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+@require_POST
+@login_required
+def log_rejected_call(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+            if 'receiver' not in data:
+                return JsonResponse({'error': 'Missing receiver'}, status=400)
+            required_fields = ['receiver', 'call_type']
+            for field in required_fields:
+                if field not in data:
+                    return JsonResponse(
+                        {'error': f'Missing required field: {field}'},
+                        status=400
+                    )
             caller = get_object_or_404(User, username=data['caller'])
             receiver = request.user
+            recent_rejected = CallHistory.objects.filter(
+                caller=caller,
+                receiver=receiver,
+                status='rejected',
+                start_time__gte=timezone.now() - timedelta(seconds=5)
+            ).exists()
 
-            # Create call history record
-            call = CallHistory.objects.create(
+            if recent_rejected:
+                return JsonResponse({'status': 'duplicate_ignored'})
+
+            CallHistory.objects.create(
                 caller=caller,
                 receiver=receiver,
                 call_type=data.get('call_type', 'video'),
-                status='missed',
-                duration=timedelta(seconds=0))
-
-            # Notify via WebSocket
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                f"notifications_{receiver.username}",
-                {
-                    'type': 'missed_call',
-                    'caller': caller.username,
-                    'caller_id': caller.id,
-                    'receiver': receiver.username,
-                    'call_type': data.get('call_type', 'video'),
-                    'timestamp': timezone.now().isoformat()
-                }
+                status='rejected',
+                start_time=timezone.now()
             )
 
             return JsonResponse({'status': 'success'})
-
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'Receiver user not found'}, status=404)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-@require_POST
-@csrf_exempt
-@login_required
-def log_rejected_call(request):
-    data = json.loads(request.body)
-    caller = User.objects.get(username=data['caller'])
-    receiver = request.user
-
-    CallHistory.objects.create(
-        caller=caller,
-        receiver=receiver,
-        call_type=data['call_type'],
-        status='rejected'
-    )
-
-    return JsonResponse({'status': 'success'})
-
-from django.utils import timezone
 
 @require_POST
 @csrf_exempt
 @login_required
 def log_completed_call(request):
-    data = json.loads(request.body)
-    caller = request.user
-    receiver = User.objects.get(username=data['receiver'])
+    try:
+        data = json.loads(request.body)
+        required_fields = ['caller', 'receiver', 'call_type', 'duration']
+        for field in required_fields:
+            if field not in data:
+                return JsonResponse({'error': f'Missing required field: {field}'}, status=400)
 
-    call = CallHistory.objects.create(
-        caller=caller,
-        receiver=receiver,
-        call_type=data['call_type'],
-        status='completed',
-        start_time=timezone.now()
-    )
-    call.end_time = timezone.now()
-    call.save()
+        # Validate duration is a number
+        try:
+            duration = float(data['duration'])
+            if duration < 0:
+                raise ValueError("Duration cannot be negative")
+        except (ValueError, TypeError):
+            return JsonResponse({'error': 'Invalid duration value'}, status=400)
 
-    return JsonResponse({'status': 'success'})
+        # Get users
+        caller = User.objects.get(username=data['caller'])
+        receiver = User.objects.get(username=data['receiver'])
+
+        # Create call record
+        CallHistory.objects.create(
+            caller=caller,
+            receiver=receiver,
+            call_type=data['call_type'],
+            status='completed',
+            start_time=timezone.now() - timedelta(seconds=duration),
+            end_time=timezone.now(),
+            duration=timedelta(seconds=duration)
+        )
+
+        return JsonResponse({'status': 'success'})
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
 @login_required
 def get_call_history(request):
     calls = CallHistory.objects.filter(
-        models.Q(caller=request.user) | models.Q(receiver=request.user)
+        (models.Q(caller=request.user) | models.Q(receiver=request.user)) &
+        ~models.Q(caller=request.user, receiver=request.user)
     ).order_by('-start_time')[:50]
     history = []
+    for call in calls:
+        if call.status == 'rejected' and 'completed' in call.status.lower():
+            call.status = 'rejected'
+            call.save()
+
     for call in calls:
         history.append({
             'id': call.id,
@@ -422,7 +477,49 @@ def get_call_history(request):
             'timestamp': call.start_time.isoformat(),
             'duration': call.duration.total_seconds() if call.duration else None,
             'direction': 'outgoing' if call.caller == request.user else 'incoming',
-            'other_user': call.receiver.username if call.caller == request.user else call.caller.username
+            'other_user': call.receiver.username if call.caller == request.user else call.caller.username,
         })
 
     return JsonResponse({'history': history})
+
+
+@require_POST
+@csrf_exempt
+@login_required
+def log_call(request):
+    try:
+        data = json.loads(request.body)
+        caller = request.user
+        receiver = get_object_or_404(User, username=data['receiver'])
+
+        # Determine direction automatically
+        direction = 'outgoing' if data.get('is_initiator', False) else 'incoming'
+
+        # Check for duplicates (5-second window)
+        duplicate = CallHistory.objects.filter(
+            caller=caller,
+            receiver=receiver,
+            start_time__gte=timezone.now() - timedelta(seconds=5)
+        ).exists()
+
+        if duplicate:
+            return JsonResponse({'status': 'duplicate_ignored'})
+
+        call = CallHistory.objects.create(
+            caller=caller,
+            receiver=receiver,
+            call_type=data.get('call_type', 'video'),
+            status=data.get('status', 'completed'),
+            direction=direction,
+            start_time=timezone.now(),
+            end_time=timezone.now() if data.get('status') == 'completed' else None
+        )
+
+        return JsonResponse({
+            'status': 'success',
+            'call_id': call.id,
+            'direction': call.direction
+        })
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)

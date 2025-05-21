@@ -123,6 +123,8 @@ class CallHistory(models.Model):
         ('missed', 'Missed'),
         ('completed', 'Completed'),
         ('rejected', 'Rejected'),
+        ('timeout', 'Timeout'),
+        ('offline', 'User Offline')
     )
 
     caller = models.ForeignKey(User, related_name='outgoing_calls', on_delete=models.CASCADE)

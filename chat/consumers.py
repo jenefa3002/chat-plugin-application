@@ -342,6 +342,7 @@ class VideoCallConsumer(AsyncWebsocketConsumer):
 
 
 class CallNotificationConsumer(AsyncWebsocketConsumer):
+
     async def connect(self):
         self.user = self.scope['user']
         if self.user.is_anonymous:
@@ -362,42 +363,82 @@ class CallNotificationConsumer(AsyncWebsocketConsumer):
             )
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
-        if data['type'] == 'missed_call':
-            await self.handle_missed_call(data)
-        if data['type'] == 'missed_call':
-            await self.channel_layer.group_send(
-                f"notifications_{self.recipient}",
-                {
-                    'type': 'missed_call',
-                    'caller': self.sender,
-                    'recipient': self.recipient,
-                    'call_type': 'video',
-                }
+        try:
+            data = json.loads(text_data)
+            message_type = data.get('type')
+
+            if message_type == 'missed_call':
+                await self.handle_missed_call(data)
+            elif message_type == 'call_rejected':
+                await self.handle_call_rejected(data)
+            else:
+                raise ValueError(f"Unsupported message type: {message_type}")
+
+        except Exception as e:
+            print(f"Error processing message: {e}")
+            await self.close()
+
+    async def handle_call_rejected(self, data):
+        try:
+            caller = await sync_to_async(User.objects.get)(username=data['caller'])
+            receiver = await sync_to_async(User.objects.get)(username=data['receiver'])
+
+            await sync_to_async(CallHistory.objects.create)(
+                caller=caller,
+                receiver=receiver,
+                call_type=data['call_type'],
+                status='rejected',
+                timestamp=timezone.now()
             )
 
+            await self.channel_layer.group_send(
+                f'call_notifications_{receiver.id}',
+                {
+                    'type': 'call_rejected',
+                    'caller': data['caller'],
+                    'receiver': data['receiver'],
+                    'call_type': data['call_type'],
+                    'timestamp': str(timezone.now())
+                }
+            )
+        except Exception as e:
+            print(f"Error handling rejected call: {e}")
+
     async def handle_missed_call(self, data):
-        caller = await sync_to_async(User.objects.get)(username=data['caller'])
-        receiver = await sync_to_async(User.objects.get)(username=data['receiver'])
+        try:
+            caller = await sync_to_async(User.objects.get)(username=data['caller'])
+            receiver = await sync_to_async(User.objects.get)(username=data['receiver'])
 
-        await sync_to_async(CallHistory.objects.create)(
-            caller=caller,
-            receiver=receiver,
-            call_type=data['call_type'],
-            status='missed'
-        )
+            await sync_to_async(CallHistory.objects.create)(
+                caller=caller,
+                receiver=receiver,
+                call_type=data['call_type'],
+                status='missed',
+                timestamp=timezone.now()
+            )
 
-        await self.channel_layer.group_send(
-            f'call_notifications_{receiver.id}',
-            {
-                'type': 'missed_call_notification',
-                'caller': data['caller'],
-                'call_type': data['call_type'],
-                'timestamp': str(timezone.now())
-            }
-        )
+            await self.channel_layer.group_send(
+                f'call_notifications_{receiver.id}',
+                {
+                    'type': 'missed_call',
+                    'caller': data['caller'],
+                    'call_type': data['call_type'],
+                    'timestamp': str(timezone.now())
+                }
+            )
+        except Exception as e:
+            print(f"Error handling missed call: {e}")
 
-    async def missed_call_notification(self, event):
+    async def call_rejected(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'call_rejected',
+            'caller': event['caller'],
+            'receiver': event['receiver'],
+            'call_type': event['call_type'],
+            'timestamp': event['timestamp']
+        }))
+
+    async def missed_call(self, event):
         await self.send(text_data=json.dumps({
             'type': 'missed_call',
             'caller': event['caller'],

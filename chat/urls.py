@@ -8,6 +8,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('log_call/', views.log_call, name='log_call'),
     path('get_call_history/', views.get_call_history, name='get_call_history'),
     path('log_missed_call/', views.log_missed_call, name='log_missed_call'),
     path('log_rejected_call/', views.log_rejected_call, name='log_rejected_call'),
